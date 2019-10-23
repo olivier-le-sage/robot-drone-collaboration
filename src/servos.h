@@ -14,16 +14,21 @@
 #define PWM0_WPI 1   // equivalent wiringPi pin
 
 /* Servo duty cycle min and max (in %). Vary by manufacturer. */
-#define DUTY_CYCLE_MIN 2.5  // defaults
-#define DUTY_CYCLE_MAX 12.5
+/* Experimentally we know the duty cycle that gives a still servo is ~6.5% */
+#define DUTY_CYCLE_MIN 2  // defaults
+#define DUTY_CYCLE_MAX 12
 
 /* RPi PWM clock base frequency */
 #define RPI_PWM_BASE_FREQ 19.2e6
+
+#define LEFT_ENCODER  0
+#define RIGHT_ENCODER 1
+#define LEFT_SERVO    0
+#define RIGHT_SERVO   1
 
 /* Prototypes */
 double servo_angle_to_duty_cycle(double angle);
 double pwm_settings_to_pwm_freq(int clk_div, int pwm_range);
 void pivot_turn_left(int degrees);
 void pivot_turn_right(int degrees);
-int read_left_encoder(); // returns rotational velocity
-int read_right_encoder();
+double read_encoder(int encoder); // returns rotational velocity
