@@ -6,6 +6,7 @@
 
 #ifndef _SERVOS_H_
 #define _SERVOS_H_
+#endif
 
 #include <wiringPi.h>
 

@@ -47,10 +47,9 @@ int main (void) {
 
     wiringPiSetupGpio();
     pinMode(PWM0_PIN, PWM_OUTPUT);
-    pwmWrite(PWM0_PIN, dir);
     pwmSetMode(PWM_MODE_MS); // choose between mark:space and balanced type PWM
     pwmSetRange(2000);
     pwmSetClock(192);
-    pwmWrite(18, 100);
+    pwmWrite(PWM0_PIN, 72);
     return 0;
 }
