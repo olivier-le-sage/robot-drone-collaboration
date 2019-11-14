@@ -6,17 +6,21 @@
 
 #ifndef _SERVOS_H_
 #define _SERVOS_H_
+#endif
 
 #include <wiringPi.h>
+#include <softPwm.h>
 
 /* PWM-capable GPIOs on the RPi 4 */
-#define PWM0_PIN 18  // pin on physical board
+#define PWM0_PIN 18  // GPIO-mode pin #
 #define PWM0_WPI 1   // equivalent wiringPi pin
+#define SOFTPWM_PIN 3 // GPIO-mode s/w pwm pin 12
 
 /* Servo duty cycle min and max (in %). Vary by manufacturer. */
 /* Experimentally we know the duty cycle that gives a still servo is ~6.5% */
-#define DUTY_CYCLE_MIN 2  // defaults
-#define DUTY_CYCLE_MAX 12
+#define DUTY_CYCLE_MIN  2  // defaults
+#define DUTY_CYCLE_MAX  12
+#define DUTY_CYCLE_NEUT 6
 
 /* RPi PWM clock base frequency */
 #define RPI_PWM_BASE_FREQ 19.2e6
@@ -25,6 +29,8 @@
 #define RIGHT_ENCODER 1
 #define LEFT_SERVO    0
 #define RIGHT_SERVO   1
+#define LEFT_SERVO_PIN  23
+#define RIGHT_SERVO_PIN 24
 
 /* Prototypes */
 double servo_angle_to_duty_cycle(double angle);
