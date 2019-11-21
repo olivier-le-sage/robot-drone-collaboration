@@ -1,3 +1,5 @@
+
+#include <stdio.h>
 #include <wiringPiI2C.h>
 
 #define ACCX_OUT 0x3B
