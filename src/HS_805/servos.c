@@ -89,8 +89,8 @@ int main (void) {
     pwmWrite(PWM0_PIN, 72);
 
     printf("===== Raspberry Pi s/w PWM test =====\n");
-    if(!softPwmCreate(SOFTPWM_PIN, 0, 100)) {
-        printf("Error: Failed to setup soft pwm.");
+    if(softPwmCreate(SOFTPWM_PIN, 0, 100) != 0) {
+        printf("Error: Failed to setup soft pwm. errno = %d", errno);
         return -1;
     }
 
