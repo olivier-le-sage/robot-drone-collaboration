@@ -8,6 +8,8 @@
 
 #define DEVID_ID 0x68
 
+int fd;
+
 int read_data(int address){
 	int value;
 	// for now reg8 but we can make it 16
@@ -20,7 +22,7 @@ int main(){
 	int Ax, Ay, Az;
 	int Ax_s, Ay_s, Az_s;
 
-	int fd = wiringPiI2CSetup(DEVID_ID);
+	fd = wiringPiI2CSetup(DEVID_ID);
 	// read data by
 
 	while(1){
