@@ -6,10 +6,7 @@
 #define ACCY_OUT 0x3D
 #define ACCZ_OUT 0x3F
 
-#define devid_id 0x68
-
-int fd = wiringPiI2CSetup(devid_id);
-// read data by
+#define DEVID_ID 0x68
 
 int read_data(int address){
 	int value;
@@ -22,6 +19,9 @@ int read_data(int address){
 int main(){
 	int Ax, Ay, Az;
 	int Ax_s, Ay_s, Az_s;
+
+	int fd = wiringPiI2CSetup(DEVID_ID);
+	// read data by
 
 	while(1){
 		Ax = read_data(ACCX_OUT);
