@@ -1,61 +1,61 @@
-#!/usr/bin/python
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-#|R|a|s|p|b|e|r|r|y|P|i|-|S|p|y|.|c|o|.|u|k|
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-#
+#!/usr/bin/python3
 # ultrasonic_1.py
 # Measure distance using an ultrasonic module
-#
-# Author : Matt Hawkins
-# Date   : 09/01/2013
 
 # Import required Python libraries
 import time
 import RPi.GPIO as GPIO
 
-# Use BCM GPIO references
-# instead of physical pin numbers
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BCM) # broadcom pin numbering
+GPIO.setwarnings(False) # not sure what this does yet
+timeout = 0.020
 
 # Define GPIO to use on Pi
-GPIO_TRIGGER = 23
-GPIO_ECHO    = 24
+GPIO_SIG = 18
+NUM_READS = 5
 
-print "Ultrasonic Measurement"
+print("Ultrasonic Measurement Test Program")
+i = 0
+while i < NUM_READS:
 
-# Set pins as output and input
-GPIO.setup(GPIO_TRIGGER,GPIO.OUT)  # Trigger
-GPIO.setup(GPIO_ECHO,GPIO.IN)      # Echo
 
-# Set trigger to False (Low)
-GPIO.output(GPIO_TRIGGER, False)
+    # Set signal pin as output
+    GPIO.setup(GPIO_SIG, GPIO.OUT)  # Signal
 
-# Allow module to settle
-time.sleep(0.5)
+    # Send signal
+    GPIO.output(GPIO_SIG, 1)
 
-# Send 10us pulse to trigger
-GPIO.output(GPIO_TRIGGER, True)
-time.sleep(0.00001)
-GPIO.output(GPIO_TRIGGER, False)
-start = time.time()
+    # Allow module to settle
+    time.sleep(0.5)
 
-while GPIO.input(GPIO_ECHO)==0:
-  start = time.time()
+    # Now setup as input
+    GPIO.setup(GPIO_SIG, GPIO.IN)
 
-while GPIO.input(GPIO_ECHO)==1:
-  stop = time.time()
+    goodread = True
+    watchtime = time.time()
+    while GPIO.input(GPIO_SIG) == 0 and goodread:
+        starttime = time.time()
+        if (starttime - watchtime > timeout):
+            goodread = False
 
-# Calculate pulse length
-elapsed = stop-start
+    if goodread:
+        watchtime = time.time()
+        while GPIO.input(GPIO_SIG) == 1 and goodread:
+            endtime = time.time()
+            if (endtime - watchtime > timeout):
+                goodread = False
 
-# Distance pulse travelled in that time is time
-# multiplied by the speed of sound (cm/s)
-distance = elapsed * 34300
+    if goodread:
+        # Calculate pulse length
+        duration = endtime - starttime
 
-# That was the distance there and back so halve the value
-distance = distance / 2
+        # Distance pulse travelled in that time is time
+        # multiplied by the speed of sound (cm/s)
+        # That was the distance there and back so halve the value
+        distance = duration * 34000 / 2
 
-print "Distance : %.1f" % distance
+    print("Distance : ", distance)
+    i += 1
 
 # Reset GPIO settings
 GPIO.cleanup()
