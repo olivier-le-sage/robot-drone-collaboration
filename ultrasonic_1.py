@@ -28,19 +28,22 @@ while i < NUM_READS:
     # Allow module to settle
     time.sleep(0.5)
 
+    # Cut off signal
+    GPIO.output(GPIO_SIG, 0)
+
     # Now setup as input
     GPIO.setup(GPIO_SIG, GPIO.IN)
 
     goodread = True
     watchtime = time.time()
-    while GPIO.input(GPIO_SIG) == 0 and goodread:
+    while (GPIO.input(GPIO_SIG) == 0) and goodread:
         starttime = time.time()
         if (starttime - watchtime > timeout):
             goodread = False
 
     if goodread:
         watchtime = time.time()
-        while GPIO.input(GPIO_SIG) == 1 and goodread:
+        while (GPIO.input(GPIO_SIG) == 1) and goodread:
             endtime = time.time()
             if (endtime - watchtime > timeout):
                 goodread = False
