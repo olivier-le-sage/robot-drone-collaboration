@@ -6,12 +6,12 @@
 import time
 import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM) # broadcom pin numbering
+GPIO.setmode(GPIO.BOARD) # broadcom pin numbering
 GPIO.setwarnings(False) # not sure what this does yet
 timeout = 0.020
 
 # Define GPIO to use on Pi
-GPIO_SIG = 18
+GPIO_SIG = 12
 NUM_READS = 5
 
 print("Ultrasonic Measurement Test Program")
