@@ -53,9 +53,8 @@ while i < NUM_READS:
         # multiplied by the speed of sound (cm/s)
         # That was the distance there and back so halve the value
         distance = duration * 34000 / 2
-
-    print("Distance : ", distance)
-    i += 1
+        print("Distance : ", distance)
+        i += 1
 
 # Reset GPIO settings
 GPIO.cleanup()
