@@ -6,13 +6,16 @@
 import sys
 
 # Add module scripts one-by-one at runtime
-sys.path.append('/src/HS_805/servos.py')
-#sys.path.append(...)
+#sys.path.insert(0, '/src/HS_805/servos.py')
+#sys.path.insert(0, ...)
+
+# import modules
+from src.HS_805.servos import ServoControl
 
 ########## Constants ##########
 
-LEFT_SERVO_PIN  = 23
-RIGHT_SERVO_PIN = 24
+LEFT_SERVO_PIN  = 23 # the big original servo
+RIGHT_SERVO_PIN = 24 # the small replacement servo
 
 ########## Initialization ##########
 
