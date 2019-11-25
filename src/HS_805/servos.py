@@ -1,12 +1,13 @@
 # High-level servo control & optical encoder read routines.
 
 from gpiozero import Servo
+from gpiozero import AngularServo
 from time import sleep
 
 class ServoControl:
     '''
         Servo control interface.
-        Provides access to high-level servo control methods
+        Provides access to high-level servo control methods.
     '''
 
     # PWM-capable GPIOs on the RPi 4
@@ -30,9 +31,9 @@ class ServoControl:
     LEFT_SERVO_PIN  = 23
     RIGHT_SERVO_PIN = 24
 
-    def __init__(self):
-        left_servo  = Servo(LEFT_SERVO_PIN)
-        right_servo = Servo(RIGHT_SERVO_PIN)
+    def __init__(self, left_servo_pin=23, right_servo_pin=24):
+        self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
+        self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
 
     def test_run(self):
         print("Testing servo min()")
@@ -69,10 +70,14 @@ class ServoControl:
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
+        left_servo.angle = 10
+        right_servo.angle = -10
         return
 
     def pivot_turn_right(self, degrees):
         ''' forwards left servo and reverses right servo to turn right '''
+        left_servo.angle = -10
+        right_servo.angle = 10
         return
 
     def read_encoder(self, encoder):
