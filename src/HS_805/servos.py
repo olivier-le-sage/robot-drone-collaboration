@@ -12,8 +12,7 @@ class ServoControl:
 
     # PWM-capable GPIOs on the RPi 4
     PWM0_PIN = 18  # GPIO-mode pin #
-    PWM0_WPI = 1   # equivalent wiringPi pin
-    SOFTPWM_PIN = 3 # GPIO-mode s/w pwm pin 12
+    PWM0_WPI = 1   # its equivalent wiringPi pin
 
     # Servo duty cycle min and max (in %). Vary by manufacturer.
     # Experimentally we know the duty cycle that gives a still servo is ~6.5%
@@ -28,8 +27,6 @@ class ServoControl:
     RIGHT_ENCODER   = 1
     LEFT_SERVO      = 0
     RIGHT_SERVO     = 1
-    LEFT_SERVO_PIN  = 23
-    RIGHT_SERVO_PIN = 24
 
     def __init__(self, left_servo_pin=23, right_servo_pin=24):
         self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
