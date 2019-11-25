@@ -34,16 +34,16 @@ class ServoControl:
 
     def test_run(self):
         print("Testing servo min()")
-        left_servo.min()
-        right_servo.min()
+        self.left_servo.min()
+        self.right_servo.min()
         sleep(2)
         print("Testing servo mid()")
-        left_servo.mid()
-        right_servo.mid()
+        self.left_servo.mid()
+        self.right_servo.mid()
         sleep(2)
         print("Testing servo max()")
-        left_servo.max()
-        right_servo.max()
+        self.left_servo.max()
+        self.right_servo.max()
         sleep(2)
 
         return

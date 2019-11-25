@@ -6,10 +6,11 @@
 import sys
 
 # Add module scripts one-by-one at runtime
-#sys.path.insert(0, '/src/HS_805/servos.py')
+sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 #sys.path.insert(0, ...)
 
-# import modules
+# import modules from src
+import src
 from src.HS_805.servos import ServoControl
 
 ########## Constants ##########
