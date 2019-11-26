@@ -4,6 +4,7 @@
 # Communicates data to bluetooth link and interprets instructions received from
 #     main control system.
 import sys
+import datetime as dt
 
 # Add module scripts one-by-one at runtime
 sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
@@ -12,6 +13,7 @@ sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 # import modules from src
 import src
 from src.HS_805.servos import ServoControl
+from src.MPU_6050.MPU_6050 import MPU6050Interface
 
 ########## Constants ##########
 
@@ -21,7 +23,15 @@ RIGHT_SERVO_PIN = 24 # the small replacement servo
 ########## Initialization ##########
 
 servo_interface = ServoControl(LEFT_SERVO_PIN, RIGHT_SERVO_PIN)
+mpu6050_interface = MPU6050Interface()
+
+# Test servos
 servo_interface.test_run()
+
+# Test accelerometer/gyroscope by reading some values
+print("===== Testing accelerometer/gyroscope =====")
+print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc())
+print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr())
 
 ########## Loop ##########
 
@@ -35,5 +45,6 @@ servo_interface.test_run()
 
 
 # 4. Execute instructions (turn left, stop moving, process path data... etc)
+# 4b. Update robot movement state if necessary (and publish it to MQTT-SN broker)
 
 # Rinse and repeat
