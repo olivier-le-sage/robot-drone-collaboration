@@ -134,7 +134,7 @@ static PyObject* py_get_ax(PyObject* self)
 }
 static PyObject* py_get_ay(PyObject* self)
 {
-	int Ay
+	int Ay;
 	short Acc_y;
 
 	Acc_y = read_raw_data(ACC_YOUT);
@@ -144,7 +144,7 @@ static PyObject* py_get_ay(PyObject* self)
 }
 static PyObject* py_get_az(PyObject* self)
 {
-	int Az
+	int Az;
 	short Acc_z;
 
 	Acc_z = read_raw_data(ACC_ZOUT);
@@ -154,7 +154,7 @@ static PyObject* py_get_az(PyObject* self)
 }
 static PyObject* py_get_gx(PyObject* self)
 {
-	int Gx
+	int Gx;
 	short Gyro_x;
 
 	Gyro_x = read_raw_data(GYRO_XOUT);
@@ -164,7 +164,7 @@ static PyObject* py_get_gx(PyObject* self)
 }
 static PyObject* py_get_gy(PyObject* self)
 {
-	int Gy
+	int Gy;
 	short Gyro_y;
 
 	Gyro_y = read_raw_data(GYRO_YOUT);
@@ -174,7 +174,7 @@ static PyObject* py_get_gy(PyObject* self)
 }
 static PyObject* py_get_gz(PyObject* self)
 {
-	int Gz
+	int Gz;
 	short Gyro_z;
 
 	Gyro_z = read_raw_data(GYRO_ZOUT);
@@ -194,7 +194,7 @@ static PyMethodDef MPU_6050_Module_methods[] = {
     {"get_gy",        py_get_gy,        METH_VARARGS},
     {"get_gz",        py_get_gz,        METH_VARARGS},
     {NULL, NULL}
-}
+};
 
 // Python Module initialisation routine.
 void init_MPU_6050(void)
