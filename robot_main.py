@@ -10,7 +10,8 @@ import datetime as dt
 sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 #sys.path.insert(0, ...)
 
-# import modules from src
+# import modules
+from mqtt_sender import MQTTSender
 import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU_6050 import MPU6050Interface
@@ -19,13 +20,19 @@ from src.MPU_6050.MPU_6050 import MPU6050Interface
 
 LEFT_SERVO_PIN  = 23 # the big original servo
 RIGHT_SERVO_PIN = 24 # the small replacement servo
+MQTT_BROKER = '' # TBD
+MQTT_HOSTNAME = '' # hostname of computer hosting the broker
 
 ########## Initialization ##########
 
 servo_interface = ServoControl(LEFT_SERVO_PIN, RIGHT_SERVO_PIN)
 mpu6050_interface = MPU6050Interface()
+mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
+
+########## Tests ##########
 
 # Test servos
+print("===== Testing servos =====")
 servo_interface.test_run()
 
 # Test accelerometer/gyroscope by reading some values
