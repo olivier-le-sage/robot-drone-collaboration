@@ -1,6 +1,9 @@
 /*
 	Set of functions used to setup the MPU6050 accelerometer and provide hooks
 		to read accelerometer and gyroscope values from its I2C interface.
+
+	NB: Must be compiled with the following command:
+	gcc $(python-config --includes) -fPIC -shared -o MPU_6050.so MPU_6050.c -lwiringPi
 */
 #include <Python.h>
 #include <wiringPiI2C.h>
@@ -197,7 +200,7 @@ static PyMethodDef MPU_6050_Module_methods[] = {
 };
 
 // Python Module initialisation routine.
-void init_MPU_6050(void)
+void initMPU_6050(void)
 {
     // Init module.
     (void) Py_InitModule("MPU_6050", MPU_6050_Module_methods);
