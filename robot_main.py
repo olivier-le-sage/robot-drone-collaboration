@@ -14,7 +14,7 @@ sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 from mqtt_sender import MQTTSender
 import src
 from src.HS_805.servos import ServoControl
-from src.MPU_6050.MPU_6050 import MPU6050Interface
+from src.MPU_6050.MPU6050Interface import MPU6050Interface
 
 ########## Constants ##########
 
