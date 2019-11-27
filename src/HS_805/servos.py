@@ -65,6 +65,14 @@ class ServoControl:
         '''
         return (RPI_PWM_BASE_FREQ / clk_div / pwm_range)
 
+    def move_forward(self, distance):
+        ''' move forward by distance centimeters '''
+        left_servo.angle = 10
+        right_servo.angle = 10
+        sleep(2) # sleep for the right amount of time to reach distance cm
+        left_servo.angle = 0
+        right_servo.angle = 0
+
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
         left_servo.angle = 10
