@@ -40,31 +40,6 @@ class ServoControl:
         self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
         self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
 
-    def test_run(self):
-        print("Testing servo min()")
-        self.left_servo.min()
-        self.right_servo.min()
-        sleep(2)
-        print("Testing servo mid()")
-        self.left_servo.mid()
-        self.right_servo.mid()
-        sleep(2)
-        print("Testing servo max()")
-        self.left_servo.max()
-        self.right_servo.max()
-        sleep(2)
-        print("Testing tilt_head(10 degrees)")
-        tilt_head(10)
-        sleep(2)
-        print("Testing tilt_head(-10 degrees)")
-        tilt_head(-10)
-        sleep(2)
-        print("Testing moving forward")
-        move(10)
-        sleep(2)
-
-        return
-
     def servo_angle_to_duty_cycle(self, angle):
         '''
             angle: servo angle, positive number between 0 and 180.
@@ -129,3 +104,28 @@ class ServoControl:
             Currently in hiatus due to poor h/w
         '''
         return
+
+        def test_run(self):
+            print("Testing servo min()")
+            self.left_servo.min()
+            self.right_servo.min()
+            sleep(2)
+            print("Testing servo mid()")
+            self.left_servo.mid()
+            self.right_servo.mid()
+            sleep(2)
+            print("Testing servo max()")
+            self.left_servo.max()
+            self.right_servo.max()
+            sleep(2)
+            print("Testing tilt_head(10 degrees)")
+            tilt_head(10)
+            sleep(2)
+            print("Testing tilt_head(-10 degrees)")
+            tilt_head(-10)
+            sleep(2)
+            print("Testing moving forward")
+            move(10)
+            sleep(2)
+
+            return
