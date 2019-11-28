@@ -20,12 +20,17 @@ from src.MPU_6050.MPU6050Interface import MPU6050Interface
 
 LEFT_SERVO_PIN  = 23 # the big original servo
 RIGHT_SERVO_PIN = 24 # the small replacement servo
+HEADTILT_SERVO_PIN = 27 # the small replacement servo
+HEADROT_SERVO_PIN = 22 # the small replacement servo
 MQTT_BROKER = '' # TBD
 MQTT_HOSTNAME = '' # hostname of computer hosting the broker
 
 ########## Initialization ##########
 
-servo_interface = ServoControl(LEFT_SERVO_PIN, RIGHT_SERVO_PIN)
+servo_interface = ServoControl(LEFT_SERVO_PIN,
+                               RIGHT_SERVO_PIN,
+                               HEADTILT_SERVO_PIN,
+                               HEADROT_SERVO_PIN)
 mpu6050_interface = MPU6050Interface()
 mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
 

@@ -28,9 +28,17 @@ class ServoControl:
     LEFT_SERVO      = 0
     RIGHT_SERVO     = 1
 
-    def __init__(self, left_servo_pin=23, right_servo_pin=24):
+    def __init__(self, left_servo_pin=23,
+                       right_servo_pin=24,
+                       headtilt_servo_pin=27,
+                       headrot_sevo_pin=22):
+
+        # NB: Default pin settings are GPIO-mode.
+        #       physically they're (resp.) 16, 18, 13, 15
         self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
         self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
+        self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
+        self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
 
     def test_run(self):
         print("Testing servo min()")
@@ -67,22 +75,37 @@ class ServoControl:
 
     def move_forward(self, distance):
         ''' move forward by distance centimeters '''
-        left_servo.angle = 10
-        right_servo.angle = 10
+        self.left_servo.angle = 10
+        self.right_servo.angle = 10
         sleep(2) # sleep for the right amount of time to reach distance cm
-        left_servo.angle = 0
-        right_servo.angle = 0
+        self.left_servo.angle = 0
+        self.right_servo.angle = 0
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
-        left_servo.angle = 10
-        right_servo.angle = -10
+        self.left_servo.angle = 10
+        self.right_servo.angle = -10
         return
 
     def pivot_turn_right(self, degrees):
         ''' forwards left servo and reverses right servo to turn right '''
-        left_servo.angle = -10
-        right_servo.angle = 10
+        self.left_servo.angle = -10
+        self.right_servo.angle = 10
+        return
+
+    def turn_head(self, degrees):
+        ''' turns the end effector/head by a certain # of degrees '''
+        self.headrot_servo.angle = degrees # WIP
+        return
+
+    def tilt_head(self, degrees):
+        '''
+            tilts the end effector/head forward or backwards by a certain
+            # of degrees.
+            Positive degrees indicates forwards.
+            Negative degrees indicates backwards.
+        '''
+        self.headtilt_servo.angle = degrees
         return
 
     def read_encoder(self, encoder):
