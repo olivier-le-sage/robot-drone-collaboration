@@ -31,7 +31,7 @@ class ServoControl:
     def __init__(self, left_servo_pin=23,
                        right_servo_pin=24,
                        headtilt_servo_pin=27,
-                       headrot_sevo_pin=22):
+                       headrot_servo_pin=22):
 
         # NB: Default pin settings are GPIO-mode.
         #       physically they're (resp.) 16, 18, 13, 15
