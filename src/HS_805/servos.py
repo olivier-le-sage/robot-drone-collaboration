@@ -73,14 +73,14 @@ class ServoControl:
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
-        self.left_servo.angle = 10
-        self.right_servo.angle = -10
+        self.left_servo.angle = 35
+        self.right_servo.angle = -35
         return
 
     def pivot_turn_right(self, degrees):
         ''' forwards left servo and reverses right servo to turn right '''
-        self.left_servo.angle = -10
-        self.right_servo.angle = 10
+        self.left_servo.angle = -35
+        self.right_servo.angle = 35
         return
 
     def turn_head(self, degrees):
@@ -118,14 +118,14 @@ class ServoControl:
         self.left_servo.max()
         self.right_servo.max()
         sleep(2)
-        print("Testing tilt_head(10 degrees)")
-        self.turn_head(10)
+        print("Testing tilt_head(35 degrees)")
+        self.turn_head(35)
         sleep(2)
-        print("Testing tilt_head(-10 degrees)")
-        self.turn_head(-10)
+        print("Testing tilt_head(-35 degrees)")
+        self.turn_head(-35)
         sleep(2)
         print("Testing moving forward")
-        self.move(10)
+        self.move(35)
         sleep(2)
 
         return
