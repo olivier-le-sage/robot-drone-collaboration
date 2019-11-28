@@ -27,6 +27,10 @@ class MPU6050Interface:
         Ax = self.functions.get_ax()
         Ay = self.functions.get_ay()
         Az = self.functions.get_az()
+
+        if (Ax == 0) and (Ay == 0) and (Az == 0):
+            print("Sensor Error: accelerometer not connected.")
+
         return (Ax, Ay, Az)
 
     def get_gyr(self):
@@ -34,4 +38,8 @@ class MPU6050Interface:
         Gx = self.functions.get_gx()
         Gy = self.functions.get_gy()
         Gz = self.functions.get_gz()
+
+        if (Gx == 0) and (Gy == 0) and (Gz == 0):
+            print("Sensor Error: gyroscope not connected.")
+
         return (Gx, Gy, Gz)

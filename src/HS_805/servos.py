@@ -53,6 +53,15 @@ class ServoControl:
         self.left_servo.max()
         self.right_servo.max()
         sleep(2)
+        print("Testing tilt_head(10 degrees)")
+        tilt_head(10)
+        sleep(2)
+        print("Testing tilt_head(-10 degrees)")
+        tilt_head(-10)
+        sleep(2)
+        print("Testing moving forward")
+        move(10)
+        sleep(2)
 
         return
 
@@ -73,13 +82,19 @@ class ServoControl:
         '''
         return (RPI_PWM_BASE_FREQ / clk_div / pwm_range)
 
-    def move_forward(self, distance):
-        ''' move forward by distance centimeters '''
-        self.left_servo.angle = 10
-        self.right_servo.angle = 10
+    def move(self, distance):
+        ''' move forward/backward by distance centimeters (negative for backward)'''
+
+        # Use experimentally obtained lookup table to map from
+        #     real-world distance to angular servo position
+        degrees = distance # temporary stand-in
+
+        self.left_servo.angle = degrees
+        self.right_servo.angle = degrees
         sleep(2) # sleep for the right amount of time to reach distance cm
-        self.left_servo.angle = 0
+        self.left_servo.angle = 0 # reset to zero
         self.right_servo.angle = 0
+        return
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
