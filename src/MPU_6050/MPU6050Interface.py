@@ -3,6 +3,7 @@
 # Provides structured access to MPU6050 routines
 
 from ctypes import *
+import os
 
 class MPU6050Interface:
     def __init__(self):
@@ -11,8 +12,9 @@ class MPU6050Interface:
             Provides python wrappers around C-level MPU6050 routines
         '''
         # setup c routines by loading shared object library
-        self.so_file = "MPU6050.so" # .so on Linux, .pyd on Windows
-        self.functions = CDLL(self.so_file)
+        self.so_file = "MPU_6050.so" # .so on Linux, .pyd on Windows
+        #self.functions = CDLL(self.so_file)
+        self.functions = CDLL.LoadLibrary(os.path.abspath(self.so_file))
 
         # initialize hardware
         self.functions.MPU6050_init()
