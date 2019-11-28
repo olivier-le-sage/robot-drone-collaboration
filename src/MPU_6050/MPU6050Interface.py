@@ -5,7 +5,10 @@
 from ctypes import *
 import os
 
+SHARED_OBJ_LIB_PATH = '/home/pi/robot-drone-collaboration/src/MPU_6050/'
+
 class MPU6050Interface:
+
     def __init__(self):
         '''
             Python interface for MPU6050.
@@ -14,7 +17,7 @@ class MPU6050Interface:
         # setup c routines by loading shared object library
         self.so_file = "MPU_6050.so" # .so on Linux, .pyd on Windows
         #self.functions = CDLL(self.so_file)
-        self.functions = CDLL.LoadLibrary(os.path.abspath(self.so_file))
+        self.functions = CDLL(SHARED_OBJ_LIB_PATH+self.so_file)
 
         # initialize hardware
         self.functions.MPU6050_init()
