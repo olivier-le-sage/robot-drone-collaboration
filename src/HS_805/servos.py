@@ -119,13 +119,13 @@ class ServoControl:
         self.right_servo.max()
         sleep(2)
         print("Testing tilt_head(10 degrees)")
-        tilt_head(self, 10)
+        self.tilt_head(10)
         sleep(2)
         print("Testing tilt_head(-10 degrees)")
-        tilt_head(self, -10)
+        self.tilt_head(-10)
         sleep(2)
         print("Testing moving forward")
-        move(self, 10)
+        self.move(10)
         sleep(2)
 
         return
