@@ -5,9 +5,14 @@
 #     main control system.
 import sys
 import datetime as dt
+import socket
+import time
+import struct
+import MQTTSN, MQTTSNinternal
 
 # Add module scripts one-by-one at runtime
 sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
+sys.path.insert(0, 'robot-drone-collaboration/lib') # import lib tree
 #sys.path.insert(0, ...)
 
 # import modules
@@ -15,6 +20,8 @@ from mqtt_sender import MQTTSender
 import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
+import lib
+import lib.MQTTSN_Python.MQTTSNclient.py
 
 ########## Constants ##########
 
@@ -27,11 +34,18 @@ MQTT_HOSTNAME = '' # hostname of computer hosting the broker
 
 ########## Initialization ##########
 
+# Set up MQTTSN Client
+client = Client("land-robot", port=1885)
+client.registerCallback(Callback())
+client.connect()
+
+# initialize servo interface
 servo_interface = ServoControl(LEFT_SERVO_PIN,
                                RIGHT_SERVO_PIN,
                                HEADTILT_SERVO_PIN,
                                HEADROT_SERVO_PIN)
-mpu6050_interface = MPU6050Interface()
+
+mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
 mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
 
 ########## Tests ##########
@@ -45,7 +59,7 @@ print("===== Testing accelerometer/gyroscope =====")
 print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc())
 print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr())
 
-########## Loop ##########
+########## Main Loop ##########
 
 # 1. Retrieve all sensor data using sensor interfaces and C functions
 
