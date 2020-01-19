@@ -16,15 +16,21 @@
  *******************************************************************************/
 """
 
-import MQTTSNclient
-
-aclient = MQTTSNclient.Client("register", port=1885)
-aclient.registerCallback(MQTTSNclient.Callback())
-
-aclient.connect()
+from MQTTSNclient import Callback
+from MQTTSNclient import Client
+import MQTTSN
+import time
+broker="192.168.1.159"
+port=1884
+aclient = Client("register")
+aclient.registerCallback(Callback())
+#aclient.loop_start()
+aclient.connect(broker,port)
 result = aclient.register("jkjkjkjkj")
-print "result from register 1 is", result
+print("result from register 1 is", result)
 result = aclient.register("jkjkjkjkj")
-print "result from register 1 is", result
+print("result from register 1 is", result)
 result = aclient.register("jkjkjkjkj2")
-print "result from register 2 is", result
+print("result from register 2 is", result)
+time.sleep(8)
+#aclient.loop_stop()
