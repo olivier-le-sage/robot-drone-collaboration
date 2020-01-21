@@ -14,6 +14,7 @@ import sys
 import bluetooth as bt
 import datetime as dt
 from threading import Thread
+from queue import Queue
 import MQTTSN
 
 ########## Constants ##########
@@ -37,8 +38,8 @@ def bluetooth_server():
     # Receive data on that connection
     while True:
         data = conn.recv(1024) # A max of 1024 bytes at a time
-        if not data:
-            break
+        print(data) # for now we simply print
+        # in the future we will also
 
 ############ Main #############
 
