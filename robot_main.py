@@ -11,7 +11,7 @@ import time
 import struct
 import threading
 import bluetooth as bt # bluetooth using PyBluez
-import MQTTSN
+# import MQTTSN
 from pprint import pprint
 
 # Add module scripts one-by-one at runtime
@@ -25,7 +25,7 @@ import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
 import lib
-import lib.MQTTSN_Python.MQTTSNclient.py
+# import lib.MQTTSN_Python.MQTTSNclient.py
 
 ########## Constants ##########
 
@@ -73,11 +73,11 @@ if target_address is not None:
 
 # Set up MQTTSN Client
 # Usage explained at: http://www.steves-internet-guide.com/python-mqttsn-client/
-client = Client("land-robot", host=MQTT_HOSTNAME, port=1884)
-client.registerCallback(Callback())
-client.connect()
-client.subscribe("land-robot/status")
-client.publish("land-robot/status", "Bluetooth link established.", port=1884)
+#client = Client("land-robot", host=MQTT_HOSTNAME, port=1884)
+#client.registerCallback(Callback())
+#client.connect()
+#client.subscribe("land-robot/status")
+#client.publish("land-robot/status", "Bluetooth link established.", port=1884)
 
 # initialize servo interface
 servo_interface = ServoControl(LEFT_SERVO_PIN,
@@ -88,7 +88,7 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
 mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
 
-client.publish("land-robot/status", "Initialization complete!", port=1884)
+#client.publish("land-robot/status", "Initialization complete!", port=1884)
 
 ########## Self-Tests/Diagnostics ##########
 
