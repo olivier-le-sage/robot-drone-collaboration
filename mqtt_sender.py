@@ -50,6 +50,11 @@ class MQTTSender:
         print("Payload had a length of: " + len(payload))
         pass
 
+    def publish(self, topic, payload):
+        # publish the desired message (WIP)
+        client.publish(topic, bytes(payload, 'utf-8'), QoS_level)
+        pass
+
     def run(self):
         client = mqtt.Client('Garbage Collector')
         client.on_connect = on_connect # function pointers
@@ -57,8 +62,7 @@ class MQTTSender:
         client.on_message = on_message
         client.connect(BROKER, 1883, 60)
 
-        # publish the desired message
-        # client.publish(topic, bytes(payload, 'utf-8'), QoS_level)
+
 
         # Blocking call that processes network traffic, dispatches callbacks and
         # handles reconnecting.

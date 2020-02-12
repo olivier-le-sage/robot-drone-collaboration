@@ -101,6 +101,8 @@ print("===== Testing accelerometer/gyroscope =====")
 print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc())
 print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr())
 
+# self-test MQTT interface
+
 # self-test ultrasonic sensor (PING sensor)
 
 # self-test GPS reading
