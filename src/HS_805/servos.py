@@ -2,6 +2,7 @@
 
 from gpiozero import Servo
 from gpiozero import AngularServo
+import RPi.GPIO as GPIO
 from time import sleep
 
 class ServoControl:
@@ -20,6 +21,10 @@ class ServoControl:
     DUTY_CYCLE_MAX = 12
     DUTY_CYCLE_NEUT = 6.5
 
+    # The two different servos have different duty cycle requirements
+    RIGHT_DC = DUTY_CYCLE_NEUT # default (WIP)
+    LEFT_DC  = DUTY_CYCLE_NEUT # default (WIP)
+
     # RPi PWM clock base frequency
     RPI_PWM_BASE_FREQ = 19.2e6
 
@@ -35,10 +40,15 @@ class ServoControl:
 
         # NB: Default pin settings are GPIO-mode.
         #       physically they're (resp.) 16, 18, 13, 15
-        self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
-        self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
+        # self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
+        # self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
         self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
         self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
+
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup([left_servo_pin, right_servo_pin], GPIO.OUT)
+        self.left_servo_ctrl = GPIO.PWM(left_servo_pin, 50)
+        self.right_servo_ctrl = GPIO.PWM(right_servo_pin, 50)
 
     def servo_angle_to_duty_cycle(self, angle):
         '''
@@ -64,23 +74,33 @@ class ServoControl:
         #     real-world distance to angular servo position
         degrees = distance # temporary stand-in
 
-        self.left_servo.angle = degrees
-        self.right_servo.angle = degrees
+        # self.left_servo.angle = degrees
+        # self.right_servo.angle = degrees
+        self.left_servo_ctrl.start(LEFT_DC+0.5)
+        self.right_servo_ctrl.start(RIGHT_DC+0.5)
         sleep(2) # sleep for the right amount of time to reach distance cm
-        self.left_servo.angle = 0 # reset to zero
-        self.right_servo.angle = 0
+        # self.left_servo.angle = 0 # reset to zero
+        # self.right_servo.angle = 0
+        self.left_servo_ctrl.stop()
+        self.right_servo_ctrl.stop()
         return
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
-        self.left_servo.angle = 80
-        self.right_servo.angle = -80
+        self.left_servo_ctrl.start(LEFT_DC-0.5)
+        self.right_servo_ctrl.start(RIGHT_DC+0.5)
+        sleep(1)
+        self.left_servo_ctrl.stop()
+        self.right_servo_ctrl.stop()
         return
 
     def pivot_turn_right(self, degrees):
         ''' forwards left servo and reverses right servo to turn right '''
-        self.left_servo.angle = -80
-        self.right_servo.angle = 80
+        self.left_servo_ctrl.start(LEFT_DC-0.5)
+        self.right_servo_ctrl.start(RIGHT_DC+0.5)
+        sleep(1)
+        self.left_servo_ctrl.stop()
+        self.right_servo_ctrl.stop()
         return
 
     def turn_head(self, degrees):
@@ -101,23 +121,11 @@ class ServoControl:
     def read_encoder(self, encoder):
         '''
             Returns the rotational velocity of an optical encoder.
-            Currently in hiatus due to poor h/w
+            Currently in hiatus due to poor h/w quality
         '''
         return
 
     def test_run(self):
-        print("Testing servo min()")
-        self.left_servo.min()
-        self.right_servo.min()
-        sleep(2)
-        print("Testing servo mid()")
-        self.left_servo.mid()
-        self.right_servo.mid()
-        sleep(2)
-        print("Testing servo max()")
-        self.left_servo.max()
-        self.right_servo.max()
-        sleep(2)
         print("Testing turn_head(35 degrees)")
         self.turn_head(80)
         sleep(2)
