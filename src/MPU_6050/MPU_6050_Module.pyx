@@ -35,38 +35,38 @@ cdef short read_raw_data(int addr):
     value = (high_byte << 8) | low_byte
     return value
 
-cdef get_ax():
+cdef short get_ax():
     cdef short Ax, Acc_x
     Acc_x = read_raw_data(ACC_XOUT)
-    Ax = Acc_x / 16384.0
+    Ax = Acc_x / 16384
     return Ax
 
-cdef get_ay():
+cdef short get_ay():
     cdef short Ay, Acc_y
     Acc_y = read_raw_data(ACC_YOUT)
-    Ay = Acc_y / 16384.0
+    Ay = Acc_y / 16384
     return Ay
 
-cdef get_az():
+cdef short get_az():
     cdef short Az, Acc_z
     Acc_z = read_raw_data(ACC_ZOUT)
-    Az = Acc_z / 16384.0
+    Az = Acc_z / 16384
     return Az
 
-cdef get_gx():
-    short Gx, Gyro_x
+cdef short get_gx():
+    cdef short Gx, Gyro_x
     Gyro_x = read_raw_data(GYRO_XOUT)
     Gx = Gyro_x / 131
     return Gx
 
-cdef get_gy():
-    short Gy, Gyro_y
+cdef short get_gy():
+    cdef short Gy, Gyro_y
     Gyro_y = read_raw_data(GYRO_YOUT)
     Gy = Gyro_y / 131
     return Gy
 
 cdef get_gz():
-    short Gz, Gyro_z
+    cdef short Gz, Gyro_z
     Gyro_z = read_raw_data(GYRO_ZOUT)
     Gz = Gyro_z / 131
     return Gz
