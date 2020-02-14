@@ -30,28 +30,28 @@ cdef void MPU6050_init():
 
 cdef short read_raw_data(int addr):
     cdef short high_byte, low_byte, value
-	high_byte = wiringPiI2CReadReg8(fd, addr)
-	low_byte = wiringPiI2CReadReg8(fd, addr+1)
-	value = (high_byte << 8) | low_byte
-	return value
+    high_byte = wiringPiI2CReadReg8(fd, addr)
+    low_byte = wiringPiI2CReadReg8(fd, addr+1)
+    value = (high_byte << 8) | low_byte
+    return value
 
 cdef get_ax():
     cdef short Ax, Acc_x
-	Acc_x = read_raw_data(ACC_XOUT)
-	Ax = Acc_x / 16384.0
-	return Ax
+    Acc_x = read_raw_data(ACC_XOUT)
+    Ax = Acc_x / 16384.0
+    return Ax
 
 cdef get_ay():
     cdef short Ay, Acc_y
-	Acc_y = read_raw_data(ACC_YOUT)
-	Ay = Acc_y / 16384.0
-	return Ay
+    Acc_y = read_raw_data(ACC_YOUT)
+    Ay = Acc_y / 16384.0
+    return Ay
 
 cdef get_az():
     cdef short Az, Acc_z
-	Acc_z = read_raw_data(ACC_ZOUT)
-	Az = Acc_z / 16384.0
-	return Az
+    Acc_z = read_raw_data(ACC_ZOUT)
+    Az = Acc_z / 16384.0
+    return Az
 
 cdef get_gx():
     short Gx, Gyro_x
