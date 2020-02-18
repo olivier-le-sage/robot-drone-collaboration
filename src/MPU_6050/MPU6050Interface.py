@@ -4,6 +4,7 @@
 
 from ctypes import *
 import os
+import MPU_6050_Module # import .so file from cython
 
 SHARED_OBJ_LIB_PATH = '/home/pi/robot-drone-collaboration/src/MPU_6050/'
 
@@ -15,9 +16,9 @@ class MPU6050Interface:
             Provides python wrappers around C-level MPU6050 routines
         '''
         # setup c routines by loading shared object library
-        self.so_file = "MPU_6050.so" # .so on Linux, .pyd on Windows
+        self.so_file = "MPU_6050_Module.so" # .so on Linux, .pyd on Windows
         #self.functions = CDLL(self.so_file)
-        self.functions = CDLL(SHARED_OBJ_LIB_PATH+self.so_file)
+        #self.functions = CDLL(SHARED_OBJ_LIB_PATH+self.so_file)
 
         # initialize hardware
         self.functions.MPU6050_init()
