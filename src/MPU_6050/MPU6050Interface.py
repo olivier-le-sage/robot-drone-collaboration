@@ -22,24 +22,24 @@ class MPU6050Interface:
         #self.functions = CDLL(SHARED_OBJ_LIB_PATH+self.so_file)
 
         # initialize hardware
-        MPU6050.MPU6050_init()
+        MPU6050.init()
 
-    def get_acc(self):
+    def get_acc_xyz(self):
         ''' returns accelerometer readings in g '''
-        Ax = MPU6050.get_ax()
-        Ay = MPU6050.get_ay()
-        Az = MPU6050.get_az()
+        #Ax = MPU6050.get_ax()
+        #Ay = MPU6050.get_ay()
+        #Az = MPU6050.get_az()
+
+        Ax, Ay, Az = MPU6050.get_acc()
 
         if (Ax == 0) and (Ay == 0) and (Az == 0):
             print("Sensor Error: accelerometer not connected.")
 
         return (Ax, Ay, Az)
 
-    def get_gyr(self):
+    def get_gyr_xyz(self):
         ''' returns gyroscope readings in degrees/sec '''
-        Gx = MPU6050.get_gx()
-        Gy = MPU6050.get_gy()
-        Gz = MPU6050.get_gz()
+        Gx, Gy, Gz = MPU6050.get_gyr()
 
         if (Gx == 0) and (Gy == 0) and (Gz == 0):
             print("Sensor Error: gyroscope not connected.")

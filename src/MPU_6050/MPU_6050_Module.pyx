@@ -76,3 +76,6 @@ def get_acc():
 
 def get_gyr():
     return (get_gx(), get_gy(), get_gz())
+
+def init():
+    MPU6050_init()
