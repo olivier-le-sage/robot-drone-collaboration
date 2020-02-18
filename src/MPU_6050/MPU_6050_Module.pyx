@@ -65,7 +65,7 @@ cdef short get_gy():
     Gy = Gyro_y / 131
     return Gy
 
-cdef get_gz():
+cdef short get_gz():
     cdef short Gz, Gyro_z
     Gyro_z = read_raw_data(GYRO_ZOUT)
     Gz = Gyro_z / 131
