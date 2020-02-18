@@ -12,7 +12,7 @@ cdef extern from "MPU_6050.h":
     int GYRO_YOUT
     int GYRO_ZOUT
 
-cdef extern from "wiringPiI2C.h":
+cdef extern from "<wiringPiI2C.h>":
     int wiringPiI2CSetup(int id)
     int wiringPiI2CWriteReg8(int id, int addr, int val)
     short wiringPiI2CReadReg8(int id, int addr)
