@@ -4,7 +4,8 @@
 
 from ctypes import *
 import os
-import MPU_6050_Module # import .so file from cython
+import pyximport; pyximport.install()
+import MPU_6050_Module.pyx as MPU6050 # import .so file from cython
 
 SHARED_OBJ_LIB_PATH = '/home/pi/robot-drone-collaboration/src/MPU_6050/'
 
@@ -21,13 +22,13 @@ class MPU6050Interface:
         #self.functions = CDLL(SHARED_OBJ_LIB_PATH+self.so_file)
 
         # initialize hardware
-        self.functions.MPU6050_init()
+        MPU6050.MPU6050_init()
 
     def get_acc(self):
         ''' returns accelerometer readings in g '''
-        Ax = self.functions.get_ax()
-        Ay = self.functions.get_ay()
-        Az = self.functions.get_az()
+        Ax = MPU6050.get_ax()
+        Ay = MPU6050.get_ay()
+        Az = MPU6050.get_az()
 
         if (Ax == 0) and (Ay == 0) and (Az == 0):
             print("Sensor Error: accelerometer not connected.")
@@ -36,9 +37,9 @@ class MPU6050Interface:
 
     def get_gyr(self):
         ''' returns gyroscope readings in degrees/sec '''
-        Gx = self.functions.get_gx()
-        Gy = self.functions.get_gy()
-        Gz = self.functions.get_gz()
+        Gx = MPU6050.get_gx()
+        Gy = MPU6050.get_gy()
+        Gz = MPU6050.get_gz()
 
         if (Gx == 0) and (Gy == 0) and (Gz == 0):
             print("Sensor Error: gyroscope not connected.")
