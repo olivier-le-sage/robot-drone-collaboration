@@ -73,7 +73,7 @@ class MQTTSender:
         self.client.on_connect = self.on_connect # function pointers
         self.client.on_publish = self.on_publish
         self.client.on_message = self.on_message
-        self.client.connect(BROKER, DEFAULT_PORT, 60)
+        self.client.connect(self.broker, DEFAULT_PORT, 60)
 
         # Processes network traffic, dispatches callbacks and
         # handles reconnecting.
