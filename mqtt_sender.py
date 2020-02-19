@@ -50,7 +50,7 @@ class MQTTSender:
             print("Connection accepted.")
         else:
             print("Connection failed: result code "+str(rc))
-        client.subscribe(topic)
+        self.client.subscribe(topic)
         pass
 
     def on_message(self, client, userdata, msg):
@@ -64,13 +64,13 @@ class MQTTSender:
 
     def publish(self, topic, payload):
         # publish the desired message (WIP)
-        client.publish(topic, bytes(payload, 'utf-8'), self.QoS_level)
+        self.client.publish(topic, bytes(payload, 'utf-8'), self.QoS_level)
         self.pub_topics.append(topic)
         pass
 
     def subscribe(self, topic):
         # subscribe to a specific topic
-        client.subscribe(topic, self.QoS_level)
+        self.client.subscribe(topic, self.QoS_level)
         self.sub_topics.append(topic)
         pass
 
@@ -79,4 +79,4 @@ class MQTTSender:
         # handles reconnecting.
         # Other loop*() functions are available that give a threaded interface and a
         # manual interface.
-        client.loop_start() # starts a thread, non-blocking
+        self.client.loop_start() # starts a thread, non-blocking
