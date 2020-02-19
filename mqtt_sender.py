@@ -39,10 +39,6 @@ class MQTTSender:
 
         # set up the Client
         self.client = mqtt.Client('Garbage Collector')
-        self.client.on_connect = on_connect # function pointers
-        self.client.on_publish = on_publish
-        self.client.on_message = on_message
-        self.client.connect(BROKER, DEFAULT_PORT, 60)
 
     # callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
@@ -50,7 +46,6 @@ class MQTTSender:
             print("Connection accepted.")
         else:
             print("Connection failed: result code "+str(rc))
-        self.client.subscribe(topic)
         pass
 
     def on_message(self, client, userdata, msg):
@@ -75,6 +70,11 @@ class MQTTSender:
         pass
 
     def run(self):
+        self.client.on_connect = on_connect # function pointers
+        self.client.on_publish = on_publish
+        self.client.on_message = on_message
+        self.client.connect(BROKER, DEFAULT_PORT, 60)
+
         # Processes network traffic, dispatches callbacks and
         # handles reconnecting.
         # Other loop*() functions are available that give a threaded interface and a
