@@ -45,7 +45,7 @@ class ServoControl:
         self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
         self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
 
-        GPIO.setmode(GPIO.BOARD)
+        # GPIO.setmode(GPIO.BOARD) # commented out b/c "diff mode already set"
         GPIO.setup([left_servo_pin, right_servo_pin], GPIO.OUT)
         self.left_servo_ctrl = GPIO.PWM(left_servo_pin, 50)
         self.right_servo_ctrl = GPIO.PWM(right_servo_pin, 50)

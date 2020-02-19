@@ -18,18 +18,12 @@ class MPU6050Interface:
         '''
         # setup c routines by loading shared object library
         self.so_file = "MPU_6050_Module.so" # .so on Linux, .pyd on Windows
-        #self.functions = CDLL(self.so_file)
-        #self.functions = CDLL(SHARED_OBJ_LIB_PATH+self.so_file)
 
         # initialize hardware
         MPU6050.init()
 
     def get_acc_xyz(self):
         ''' returns accelerometer readings in g '''
-        #Ax = MPU6050.get_ax()
-        #Ay = MPU6050.get_ay()
-        #Az = MPU6050.get_az()
-
         Ax, Ay, Az = MPU6050.get_acc()
 
         if (Ax == 0) and (Ay == 0) and (Az == 0):

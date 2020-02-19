@@ -34,8 +34,8 @@ RIGHT_SERVO_PIN = 24 # the small replacement servo
 HEADTILT_SERVO_PIN = 27 # the small replacement servo
 HEADROT_SERVO_PIN = 22 # the small replacement servo
 
-MQTT_BROKER = '' # TBD
-MQTT_HOSTNAME = '' # hostname/IP of computer hosting the broker
+MQTT_HOSTNAME = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
+MQTT_BROKER = MQTT_HOSTNAME # provisionally working
 
 ROBOT_WIDTH = 0.03 # ~30 cm
 ROBOT_HEIGHT = 0.03 # ~30 cm
@@ -49,7 +49,7 @@ BLUETOOTH_TGT_ADDR = None     # TBD
 # First we search for devices nearby and try to connect to the laptop
 target_address = None
 bluetooth_connected = False
-nearby_devices = bt.discover_devices(duration=8) # scans for ~8 seconds
+nearby_devices = bt.discover_devices(duration=1) # scans for ~8 seconds
 for bdaddr in nearby_devices:
     if BLUETOOTH_TGT_NAME == bt.lookup_name(bdaddr):
         target_address = bdaddr
@@ -87,8 +87,7 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
 
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
 mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
-
-#client.publish("land-robot/status", "Initialization complete!", port=1884)
+mqtt_interface.publish("land-robot/status", "Initialization complete!")
 
 ########## Self-Tests/Diagnostics ##########
 
