@@ -87,7 +87,9 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
 
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
 mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
+mqtt_interface.run()
 mqtt_interface.publish("land-robot/status", "Initialization complete!")
+
 
 ########## Self-Tests/Diagnostics ##########
 
