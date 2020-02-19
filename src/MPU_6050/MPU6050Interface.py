@@ -5,7 +5,7 @@
 from ctypes import *
 import os
 import pyximport; pyximport.install()
-import src.MPU_6050.MPU_6050_Module.pyx as MPU6050 # import .so file from cython
+import src.MPU_6050.MPU_6050_Module as MPU6050 # import .so file from cython
 
 SHARED_OBJ_LIB_PATH = '/home/pi/robot-drone-collaboration/src/MPU_6050/'
 
