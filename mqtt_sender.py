@@ -70,9 +70,9 @@ class MQTTSender:
         pass
 
     def run(self):
-        self.client.on_connect = on_connect # function pointers
-        self.client.on_publish = on_publish
-        self.client.on_message = on_message
+        self.client.on_connect = self.on_connect # function pointers
+        self.client.on_publish = self.on_publish
+        self.client.on_message = self.on_message
         self.client.connect(BROKER, DEFAULT_PORT, 60)
 
         # Processes network traffic, dispatches callbacks and
