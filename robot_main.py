@@ -32,8 +32,11 @@ import lib
 # BOARD-mode pin numbers
 LEFT_SERVO_PIN  = 12 # the big original servo
 RIGHT_SERVO_PIN = 33 # the small replacement servo
-HEADTILT_SERVO_PIN = 13 # the small replacement servo
-HEADROT_SERVO_PIN = 15 # the small replacement servo
+# HEADTILT_SERVO_PIN = 13 # the small replacement servo
+# HEADROT_SERVO_PIN = 15 # the small replacement servo
+HEADTILT_SERVO_PIN = 27
+HEADROT_SERVO_PIN  = 22
+
 
 MQTT_HOSTNAME = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
 MQTT_BROKER = MQTT_HOSTNAME # provisionally working

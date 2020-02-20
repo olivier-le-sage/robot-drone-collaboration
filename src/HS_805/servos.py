@@ -45,8 +45,8 @@ class ServoControl:
         #       physically they're (resp.) 12, 33, 13, 15
         # self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
         # self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
-        self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
-        self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
+        # self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
+        # self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
 
         GPIO.setup([left_servo_pin, right_servo_pin], GPIO.OUT)
         self.left_servo_ctrl = GPIO.PWM(left_servo_pin, 50)
@@ -107,7 +107,8 @@ class ServoControl:
 
     def turn_head(self, degrees):
         ''' turns the end effector/head by a certain # of degrees '''
-        self.headrot_servo.angle = degrees # WIP
+        # on hiatus
+        # self.headrot_servo.angle = degrees # WIP
         return
 
     def tilt_head(self, degrees):
@@ -117,7 +118,8 @@ class ServoControl:
             Positive degrees indicates forwards.
             Negative degrees indicates backwards.
         '''
-        self.headtilt_servo.angle = degrees
+        # on hiatus
+        # self.headtilt_servo.angle = degrees
         return
 
     def read_encoder(self, encoder):
@@ -130,16 +132,6 @@ class ServoControl:
     def test_run(self):
         print("Testing moving forward")
         self.move(50)
-        sleep(2)
-        print("Testing turn_head(35 degrees)")
-        self.turn_head(80)
-        sleep(2)
-        self.turn_head(0)
-        sleep(2)
-        print("Testing turn_head(-35 degrees)")
-        self.turn_head(-80)
-        sleep(2)
-        self.turn_head(0)
         sleep(2)
 
         GPIO.cleanup()
