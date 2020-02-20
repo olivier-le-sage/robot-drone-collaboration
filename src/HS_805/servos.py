@@ -80,7 +80,7 @@ class ServoControl:
         '''
             Operate both the left and right sides at neutral.
             The robot won't move.
-            Values obtained experimentally.
+            This has to be called before calling movement-related routines.
         '''
 
         self.left_servo_ctrl.start(LEFT_DC)
@@ -88,7 +88,9 @@ class ServoControl:
         return
 
     def move(self, distance):
-        ''' move forward/backward by distance centimeters (negative for backward)'''
+        '''
+            move forward/backward by distance centimeters (negative for backward)
+        '''
 
         # Use experimentally obtained lookup table to map from
         #     real-world distance to angular servo position
@@ -96,31 +98,29 @@ class ServoControl:
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
-        self.left_servo_ctrl.start(LEFT_DC-1.0)
-        self.right_servo_ctrl.start(RIGHT_DC+1.0)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-1.0)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+1.0)
         sleep(3) # sleep for the right amount of time to reach distance cm
-        # self.left_servo.angle = 0 # reset to zero
-        # self.right_servo.angle = 0
-        self.left_servo_ctrl.stop()
-        self.right_servo_ctrl.stop()
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
-        self.left_servo_ctrl.start(LEFT_DC-0.5)
-        self.right_servo_ctrl.start(RIGHT_DC+0.5)
-        sleep(1)
-        self.left_servo_ctrl.stop()
-        self.right_servo_ctrl.stop()
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC+0.5)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
+        sleep(2)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
 
     def pivot_turn_right(self, degrees):
         ''' forwards left servo and reverses right servo to turn right '''
-        self.left_servo_ctrl.start(LEFT_DC-0.5)
-        self.right_servo_ctrl.start(RIGHT_DC+0.5)
-        sleep(1)
-        self.left_servo_ctrl.stop()
-        self.right_servo_ctrl.stop()
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC-0.5)
+        sleep(2)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
 
     def turn_head(self, degrees):
@@ -149,14 +149,17 @@ class ServoControl:
 
     def test_run(self):
 
-        print("Testing moving forward")
-        self.move(50)
-        sleep(2)
-
         print("Testing neutral position")
         self.neutral()
         sleep(2)
 
+        print("Testing moving forward")
+        self.move(50)
+        sleep(2)
+
+        # stop the PWMs and clean up resources
+        self.left_servo_ctrl.stop()
+        self.right_servo_ctrl.stop()
         GPIO.cleanup()
 
         return
