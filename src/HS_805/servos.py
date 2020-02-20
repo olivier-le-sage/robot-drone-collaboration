@@ -16,7 +16,7 @@ PWM1_PIN = 33 # ?? # BOARD-mode pins
 # Futaba S148 -- goes COUNTER-CLKWISE with increasing DC
 FUT_DC_MIN = 2.75  # 550 usec @50Hz
 FUT_DC_MAX = 11.65 # 2330 usec @50Hz
-# FUT_DC_NEUT = (DUTY_CYCLE_MIN + DUTY_CYCLE_MAX) / 2 # assumed to be the middle
+# FUT_DC_NEUT = (FUT_DC_MIN + FUT_DC_MAX) / 2 # assumed to be the middle
 FUT_DC_NEUT = 7.6 # 1520 usec @50Hz (skeptical)
 
 # HS-805 -- goes CLKWISE with increasing DC
@@ -96,8 +96,8 @@ class ServoControl:
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
-        self.left_servo_ctrl.start(LEFT_DC-0.5)
-        self.right_servo_ctrl.start(RIGHT_DC+0.5)
+        self.left_servo_ctrl.start(LEFT_DC-1.0)
+        self.right_servo_ctrl.start(RIGHT_DC+1.0)
         sleep(3) # sleep for the right amount of time to reach distance cm
         # self.left_servo.angle = 0 # reset to zero
         # self.right_servo.angle = 0
