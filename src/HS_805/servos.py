@@ -58,6 +58,8 @@ class ServoControl:
         GPIO.setup([left_servo_pin, right_servo_pin], GPIO.OUT)
         self.left_servo_ctrl = GPIO.PWM(left_servo_pin, 50)
         self.right_servo_ctrl = GPIO.PWM(right_servo_pin, 50)
+        self.left_servo_ctrl.start(0)
+        self.right_servo_ctrl.start(0)
 
     def servo_angle_to_duty_cycle(self, angle):
         '''
@@ -83,8 +85,8 @@ class ServoControl:
             This has to be called before calling movement-related routines.
         '''
 
-        self.left_servo_ctrl.start(LEFT_DC)
-        self.right_servo_ctrl.start(RIGHT_DC)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
 
     def move(self, distance):
