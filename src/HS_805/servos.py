@@ -69,6 +69,17 @@ class ServoControl:
         '''
         return (RPI_PWM_BASE_FREQ / clk_div / pwm_range)
 
+    def neutral(self):
+        '''
+            Operate both the left and right sides at neutral.
+            The robot won't move.
+            Values obtained experimentally.
+        '''
+
+        self.left_servo_ctrl.start(LEFT_DC)
+        self.right_servo_ctrl.start(RIGHT_DC)
+        return
+
     def move(self, distance):
         ''' move forward/backward by distance centimeters (negative for backward)'''
 
@@ -80,7 +91,7 @@ class ServoControl:
         # self.right_servo.angle = degrees
         self.left_servo_ctrl.start(LEFT_DC+0.5)
         self.right_servo_ctrl.start(RIGHT_DC+0.5)
-        sleep(10) # sleep for the right amount of time to reach distance cm
+        sleep(3) # sleep for the right amount of time to reach distance cm
         # self.left_servo.angle = 0 # reset to zero
         # self.right_servo.angle = 0
         self.left_servo_ctrl.stop()
@@ -130,8 +141,13 @@ class ServoControl:
         return
 
     def test_run(self):
+
         print("Testing moving forward")
         self.move(50)
+        sleep(2)
+
+        print("Testing neutral position")
+        self.neutral()
         sleep(2)
 
         GPIO.cleanup()
