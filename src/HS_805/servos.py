@@ -5,33 +5,33 @@ from gpiozero import AngularServo
 import RPi.GPIO as GPIO
 from time import sleep
 
+# PWM-capable GPIOs on the RPi 4
+PWM0_PIN = 18  # GPIO-mode pin #
+PWM0_WPI = 1   # its equivalent wiringPi pin
+
+# Servo duty cycle min and max (in %). Vary by manufacturer.
+# Experimentally we know the duty cycle that gives a still servo is ~6.5%
+DUTY_CYCLE_MIN = 2  # defaults
+DUTY_CYCLE_MAX = 12
+DUTY_CYCLE_NEUT = 6.5
+
+# The two different servos have different duty cycle requirements
+RIGHT_DC = DUTY_CYCLE_NEUT # default (WIP)
+LEFT_DC  = DUTY_CYCLE_NEUT # default (WIP)
+
+# RPi PWM clock base frequency
+RPI_PWM_BASE_FREQ = 19.2e6
+
+LEFT_ENCODER    = 0
+RIGHT_ENCODER   = 1
+LEFT_SERVO      = 0
+RIGHT_SERVO     = 1
+
 class ServoControl:
     '''
         Servo control interface.
         Provides access to high-level servo control methods.
     '''
-
-    # PWM-capable GPIOs on the RPi 4
-    PWM0_PIN = 18  # GPIO-mode pin #
-    PWM0_WPI = 1   # its equivalent wiringPi pin
-
-    # Servo duty cycle min and max (in %). Vary by manufacturer.
-    # Experimentally we know the duty cycle that gives a still servo is ~6.5%
-    DUTY_CYCLE_MIN = 2  # defaults
-    DUTY_CYCLE_MAX = 12
-    DUTY_CYCLE_NEUT = 6.5
-
-    # The two different servos have different duty cycle requirements
-    RIGHT_DC = DUTY_CYCLE_NEUT # default (WIP)
-    LEFT_DC  = DUTY_CYCLE_NEUT # default (WIP)
-
-    # RPi PWM clock base frequency
-    RPI_PWM_BASE_FREQ = 19.2e6
-
-    LEFT_ENCODER    = 0
-    RIGHT_ENCODER   = 1
-    LEFT_SERVO      = 0
-    RIGHT_SERVO     = 1
 
     def __init__(self, left_servo_pin=23,
                        right_servo_pin=24,
