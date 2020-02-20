@@ -16,14 +16,23 @@ PWM1_PIN = 33 # ?? # BOARD-mode pins
 # Futaba S148 -- goes COUNTER-CLKWISE with increasing DC
 FUT_DC_MIN = 2.75  # 550 usec @50Hz
 FUT_DC_MAX = 11.65 # 2330 usec @50Hz
-# FUT_DC_NEUT = (FUT_DC_MIN + FUT_DC_MAX) / 2 # assumed to be the middle
 FUT_DC_NEUT = 7.6 # 1520 usec @50Hz (skeptical)
+# FUT_DC_NEUT = (FUT_DC_MIN + FUT_DC_MAX) / 2 # assumed to be the middle
 
 # HS-805 -- goes CLKWISE with increasing DC
 # 400 usec DC difference <==> 45 degrees
+# Values calculated from datasheet
 HS_DC_MIN = 3.5  # 1500-400*2 = 700  usec @50Hz
 HS_DC_MAX = 11.5 # 1500+400*2 = 2300 usec @50Hz
 HS_DC_NEUT = 7.5 # 1500 usec @50Hz
+
+# Values found experimentally using the following pigpio commands
+#   sudo pigpiod # start pigpio daemon
+#   pigs s 18 1000 # counterclockwise
+#   pigs s 18 1500 # centre
+#   pigs s 18 2000 # clockwise
+#   pigs s 18 0 # switch servo pulses off
+HS_DC_NEUT  = 6.55 # 1310 usec @50Hz
 
 # The two different servos have different duty cycle requirements
 RIGHT_DC = FUT_DC_NEUT
