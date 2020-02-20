@@ -5,9 +5,11 @@ from gpiozero import AngularServo
 import RPi.GPIO as GPIO
 from time import sleep
 
+# set GPIO mode to BCM (NB: not the physical pin numbers)
+GPIO.setmode(GPIO.BOARD)
+
 # PWM-capable GPIOs on the RPi 4
 PWM0_PIN = 18  # GPIO-mode pin #
-PWM0_WPI = 1   # its equivalent wiringPi pin
 
 # Servo duty cycle min and max (in %). Vary by manufacturer.
 # Experimentally we know the duty cycle that gives a still servo is ~6.5%
@@ -38,14 +40,13 @@ class ServoControl:
                        headtilt_servo_pin=27,
                        headrot_servo_pin=22):
 
-        # NB: Default pin settings are GPIO-mode.
+        # NB: Default pin settings are BCM-mode.
         #       physically they're (resp.) 16, 18, 13, 15
         # self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
         # self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
         self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)
         self.headrot_servo = AngularServo(headrot_servo_pin, min_angle=-90, max_angle=90)
 
-        # GPIO.setmode(GPIO.BOARD) # commented out b/c "diff mode already set"
         GPIO.setup([left_servo_pin, right_servo_pin], GPIO.OUT)
         self.left_servo_ctrl = GPIO.PWM(left_servo_pin, 50)
         self.right_servo_ctrl = GPIO.PWM(right_servo_pin, 50)
@@ -78,7 +79,7 @@ class ServoControl:
         # self.right_servo.angle = degrees
         self.left_servo_ctrl.start(LEFT_DC+0.5)
         self.right_servo_ctrl.start(RIGHT_DC+0.5)
-        sleep(2) # sleep for the right amount of time to reach distance cm
+        sleep(10) # sleep for the right amount of time to reach distance cm
         # self.left_servo.angle = 0 # reset to zero
         # self.right_servo.angle = 0
         self.left_servo_ctrl.stop()
@@ -126,6 +127,9 @@ class ServoControl:
         return
 
     def test_run(self):
+        print("Testing moving forward")
+        self.move(50)
+        sleep(2)
         print("Testing turn_head(35 degrees)")
         self.turn_head(80)
         sleep(2)
@@ -136,8 +140,7 @@ class ServoControl:
         sleep(2)
         self.turn_head(0)
         sleep(2)
-        print("Testing moving forward")
-        self.move(80)
-        sleep(2)
+
+        GPIO.cleanup()
 
         return

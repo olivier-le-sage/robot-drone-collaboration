@@ -29,10 +29,11 @@ import lib
 
 ########## Constants ##########
 
-LEFT_SERVO_PIN  = 23 # the big original servo
-RIGHT_SERVO_PIN = 24 # the small replacement servo
-HEADTILT_SERVO_PIN = 27 # the small replacement servo
-HEADROT_SERVO_PIN = 22 # the small replacement servo
+# BOARD-mode pin numbers
+LEFT_SERVO_PIN  = 16 # the big original servo
+RIGHT_SERVO_PIN = 18 # the small replacement servo
+HEADTILT_SERVO_PIN = 13 # the small replacement servo
+HEADROT_SERVO_PIN = 15 # the small replacement servo
 
 MQTT_HOSTNAME = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
 MQTT_BROKER = MQTT_HOSTNAME # provisionally working
@@ -40,7 +41,7 @@ MQTT_BROKER = MQTT_HOSTNAME # provisionally working
 ROBOT_WIDTH = 0.03 # ~30 cm
 ROBOT_HEIGHT = 0.03 # ~30 cm
 
-BLUETOOTH_TGT_NAME = "Laptop" # TBD
+BLUETOOTH_TGT_NAME = 'LAPTOP-KDBVI58S' # TBD
 BLUETOOTH_TGT_ADDR = None     # TBD
 
 ########## Initialization ##########
@@ -51,7 +52,8 @@ target_address = None
 bluetooth_connected = False
 nearby_devices = bt.discover_devices(duration=1) # scans for ~8 seconds
 for bdaddr in nearby_devices:
-    print("Bluetooth device found: " + str(bdaddr))
+    print("Bluetooth device found: " + str(bdaddr) + " "
+		+ str(bt.lookup_name(bdaddr)))
     if BLUETOOTH_TGT_NAME == bt.lookup_name(bdaddr):
         target_address = bdaddr
         break
@@ -98,8 +100,8 @@ servo_interface.test_run()
 
 # self-test accelerometer/gyroscope by reading some values
 print("===== Testing accelerometer/gyroscope =====")
-print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc())
-print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr())
+print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc_xyz())
+print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr_xyz())
 
 # self-test MQTT interface
 mqtt_interface.publish("land-robot/status", "Initialization complete!")
