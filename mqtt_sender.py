@@ -73,7 +73,10 @@ class MQTTSender:
         self.client.on_connect = self.on_connect # function pointers
         self.client.on_publish = self.on_publish
         self.client.on_message = self.on_message
-        self.client.connect(self.broker, DEFAULT_PORT, 60)
+
+        # we connect asynchronously so that loop_start() will attempt to
+        # re-connect in the event of a connection failure
+        self.client.connect_async(self.broker, DEFAULT_PORT, 60)
 
         # Processes network traffic, dispatches callbacks and
         # handles reconnecting.

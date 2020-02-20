@@ -51,6 +51,7 @@ target_address = None
 bluetooth_connected = False
 nearby_devices = bt.discover_devices(duration=1) # scans for ~8 seconds
 for bdaddr in nearby_devices:
+    print("Bluetooth device found: " + str(bdaddr))
     if BLUETOOTH_TGT_NAME == bt.lookup_name(bdaddr):
         target_address = bdaddr
         break
@@ -87,9 +88,7 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
 
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
 mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
-mqtt_interface.run()
-mqtt_interface.publish("land-robot/status", "Initialization complete!")
-
+mqtt_interface.run() # start mqtt client thread in bg
 
 ########## Self-Tests/Diagnostics ##########
 
@@ -103,6 +102,7 @@ print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc())
 print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr())
 
 # self-test MQTT interface
+mqtt_interface.publish("land-robot/status", "Initialization complete!")
 
 # self-test ultrasonic sensor (PING sensor)
 
