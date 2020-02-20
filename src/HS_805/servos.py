@@ -8,8 +8,9 @@ from time import sleep
 # set GPIO mode to BCM (NB: not the physical pin numbers)
 GPIO.setmode(GPIO.BOARD)
 
-# PWM-capable GPIOs on the RPi 4
-PWM0_PIN = 18  # GPIO-mode pin #
+# PWM-capable GPIOs (two GPIOs per PWM) on the RPi 4
+PWM0_PIN = 12 # 32 # BOARD-mode pins
+PWM1_PIN = 33 # ?? # BOARD-mode pins
 
 # Servo duty cycle min and max (in %). Vary by manufacturer.
 # Experimentally we know the duty cycle that gives a still servo is ~6.5%
@@ -35,13 +36,13 @@ class ServoControl:
         Provides access to high-level servo control methods.
     '''
 
-    def __init__(self, left_servo_pin=23,
-                       right_servo_pin=24,
+    def __init__(self, left_servo_pin=18,
+                       right_servo_pin=13,
                        headtilt_servo_pin=27,
                        headrot_servo_pin=22):
 
         # NB: Default pin settings are BCM-mode.
-        #       physically they're (resp.) 16, 18, 13, 15
+        #       physically they're (resp.) 12, 33, 13, 15
         # self.left_servo  = AngularServo(left_servo_pin, min_angle=-90, max_angle=90)
         # self.right_servo = AngularServo(right_servo_pin, min_angle=-90, max_angle=90)
         self.headtilt_servo = AngularServo(headtilt_servo_pin, min_angle=-90, max_angle=90)

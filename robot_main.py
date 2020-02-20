@@ -30,8 +30,8 @@ import lib
 ########## Constants ##########
 
 # BOARD-mode pin numbers
-LEFT_SERVO_PIN  = 16 # the big original servo
-RIGHT_SERVO_PIN = 18 # the small replacement servo
+LEFT_SERVO_PIN  = 12 # the big original servo
+RIGHT_SERVO_PIN = 33 # the small replacement servo
 HEADTILT_SERVO_PIN = 13 # the small replacement servo
 HEADROT_SERVO_PIN = 15 # the small replacement servo
 
