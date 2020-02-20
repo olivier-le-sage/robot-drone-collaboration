@@ -12,15 +12,22 @@ GPIO.setmode(GPIO.BOARD)
 PWM0_PIN = 12 # 32 # BOARD-mode pins
 PWM1_PIN = 33 # ?? # BOARD-mode pins
 
-# Servo duty cycle min and max (in %). Vary by manufacturer.
-# Experimentally we know the duty cycle that gives a still servo is ~6.5%
-DUTY_CYCLE_MIN = 2  # defaults
-DUTY_CYCLE_MAX = 12
-DUTY_CYCLE_NEUT = 6.5
+# Servo duty cycle characteristics. Vary by manufacturer.
+# Futaba S148 -- goes COUNTER-CLKWISE with increasing DC
+FUT_DC_MIN = 2.75  # 550 usec @50Hz
+FUT_DC_MAX = 11.65 # 2330 usec @50Hz
+# FUT_DC_NEUT = (DUTY_CYCLE_MIN + DUTY_CYCLE_MAX) / 2 # assumed to be the middle
+FUT_DC_NEUT = 7.6 # 1520 usec @50Hz (skeptical)
+
+# HS-805 -- goes CLKWISE with increasing DC
+# 400 usec DC difference <==> 45 degrees
+HS_DC_MIN = 3.5  # 1500-400*2 = 700  usec @50Hz
+HS_DC_MAX = 11.5 # 1500+400*2 = 2300 usec @50Hz
+HS_DC_NEUT = 7.5 # 1500 usec @50Hz
 
 # The two different servos have different duty cycle requirements
-RIGHT_DC = DUTY_CYCLE_NEUT # default (WIP)
-LEFT_DC  = DUTY_CYCLE_NEUT # default (WIP)
+RIGHT_DC = FUT_DC_NEUT
+LEFT_DC  = HS_DC_NEUT
 
 # RPi PWM clock base frequency
 RPI_PWM_BASE_FREQ = 19.2e6
@@ -89,7 +96,7 @@ class ServoControl:
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
-        self.left_servo_ctrl.start(LEFT_DC+0.5)
+        self.left_servo_ctrl.start(LEFT_DC-0.5)
         self.right_servo_ctrl.start(RIGHT_DC+0.5)
         sleep(3) # sleep for the right amount of time to reach distance cm
         # self.left_servo.angle = 0 # reset to zero
