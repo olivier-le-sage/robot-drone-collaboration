@@ -105,20 +105,16 @@ class ServoControl:
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
 
-    def move(self, distance):
+    def move(self, seconds):
         '''
             move forward/backward by distance centimeters (negative for backward)
         '''
-
-        # Use experimentally obtained lookup table to map from
-        #     real-world distance to angular servo position
-        degrees = distance # temporary stand-in
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
-        sleep(3) # sleep for the right amount of time to reach distance cm
+        sleep(seconds) # sleep for the right amount of time to reach distance cm
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
@@ -127,7 +123,7 @@ class ServoControl:
         ''' forwards right servo and reverses left servo to turn left '''
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC+0.5)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
-        sleep(2)
+        sleep(2) # temporary
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
@@ -136,7 +132,7 @@ class ServoControl:
         ''' forwards left servo and reverses right servo to turn right '''
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC-0.5)
-        sleep(2)
+        sleep(2) # temporary
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
@@ -172,7 +168,7 @@ class ServoControl:
         sleep(5)
 
         print("Testing moving forward")
-        self.move(50)
+        self.move(3)
         sleep(2)
 
         print("Testing left pivot turn")
