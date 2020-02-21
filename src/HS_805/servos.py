@@ -26,7 +26,7 @@ HS_805_DC_MIN  = 3.5  # 1500-400*2 = 700  usec @50Hz
 HS_805_DC_MAX  = 11.5 # 1500+400*2 = 2300 usec @50Hz
 HS_805_DC_NEUT = 7.5 # 1500 usec @50Hz
 
-# HS-785HB -- goes CLKWISE with increasing DC
+# HS-785HB -- goes COUNTER-CLKWISE with increasing DC
 # Values calculated from datasheet
 HS_785_DC_MIN  = 3.5 # 700 usec @50Hz
 HS_785_DC_MAX  = 12.0 # UNKNOWN -- theoretical expectation
@@ -39,7 +39,7 @@ HS_785_DC_NEUT = 7.0 # UNKNOWN -- theoretical expectation
 #   pigs s 18 2000 # clockwise
 #   pigs s 18 0 # switch servo pulses off
 HS_805_DC_NEUT  = 6.18 #6.55 # 1310 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
-HS_785_DC_NEUT = 7.62 #8.0 # 1600 usec @50Hz -- TO BE TESTED
+HS_785_DC_NEUT = 7.62  #8.0 # 1600 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
 
 # The two different servos have different duty cycle requirements
 RIGHT_DC = HS_785_DC_NEUT
