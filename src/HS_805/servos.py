@@ -22,9 +22,15 @@ FUT_DC_NEUT = 7.6 # 1520 usec @50Hz (skeptical)
 # HS-805 -- goes CLKWISE with increasing DC
 # 400 usec DC difference <==> 45 degrees
 # Values calculated from datasheet
-HS_DC_MIN = 3.5  # 1500-400*2 = 700  usec @50Hz
-HS_DC_MAX = 11.5 # 1500+400*2 = 2300 usec @50Hz
-HS_DC_NEUT = 7.5 # 1500 usec @50Hz
+HS_805_DC_MIN  = 3.5  # 1500-400*2 = 700  usec @50Hz
+HS_805_DC_MAX  = 11.5 # 1500+400*2 = 2300 usec @50Hz
+HS_805_DC_NEUT = 7.5 # 1500 usec @50Hz
+
+# HS-785HB -- goes CLKWISE with increasing DC
+# Values calculated from datasheet
+HS_785_DC_MIN  = 3.5 # 700 usec @50Hz
+HS_785_DC_MAX  = 12.0 # UNKNOWN -- theoretical expectation
+HS_785_DC_NEUT = 7.0 # UNKNOWN -- theoretical expectation
 
 # Values found experimentally using the following pigpio commands
 #   sudo pigpiod # start pigpio daemon
@@ -32,11 +38,12 @@ HS_DC_NEUT = 7.5 # 1500 usec @50Hz
 #   pigs s 18 1500 # centre
 #   pigs s 18 2000 # clockwise
 #   pigs s 18 0 # switch servo pulses off
-HS_DC_NEUT  = 6.55 # 1310 usec @50Hz
+HS_805_DC_NEUT  = 6.55 # 1310 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
+HS_785_DC_NEUT = 8.05 # 1610 usec @50Hz -- TO BE TESTED
 
 # The two different servos have different duty cycle requirements
-RIGHT_DC = FUT_DC_NEUT
-LEFT_DC  = HS_DC_NEUT
+RIGHT_DC = HS_785_DC_NEUT
+LEFT_DC  = HS_805_DC_NEUT
 
 # RPi PWM clock base frequency
 RPI_PWM_BASE_FREQ = 19.2e6
@@ -109,8 +116,8 @@ class ServoControl:
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
-        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-1.0)
-        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+1.0)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC+0.5)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
         sleep(3) # sleep for the right amount of time to reach distance cm
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
@@ -118,7 +125,7 @@ class ServoControl:
 
     def pivot_turn_left(self, degrees):
         ''' forwards right servo and reverses left servo to turn left '''
-        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC+0.5)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
         sleep(2)
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
@@ -127,7 +134,7 @@ class ServoControl:
 
     def pivot_turn_right(self, degrees):
         ''' forwards left servo and reverses right servo to turn right '''
-        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC+0.5)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC-0.5)
         sleep(2)
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
