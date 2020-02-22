@@ -14,13 +14,13 @@ package robot_drone_collaboration;
 // Message defining a Accelerometer/Gyroscope datapoint
 message MPU6050Data {
     // Accelerometer x, y, z
-    int32  Ax = 1;
-    int32  Ay = 2;
-    int32  Az = 3;
+    float  Ax = 1;
+    float  Ay = 2;
+    float  Az = 3;
     // Gyroscope x, y, z
-    int32  Gx = 4;
-    int32  Gy = 5;
-    int32  Gz = 6;
+    float  Gx = 4;
+    float  Gy = 5;
+    float  Gz = 6;
     // Timestamp (optional)
     string timestamp = 7;
 }

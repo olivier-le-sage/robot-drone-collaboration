@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='robot_drone_collaboration',
   syntax='proto3',
   serialized_options=b'B\013std_packageP\001',
-  serialized_pb=b'\n\x12message_defs.proto\x12\x19robot_drone_collaboration\"h\n\x0bMPU6050Data\x12\n\n\x02\x41x\x18\x01 \x01(\x05\x12\n\n\x02\x41y\x18\x02 \x01(\x05\x12\n\n\x02\x41z\x18\x03 \x01(\x05\x12\n\n\x02Gx\x18\x04 \x01(\x05\x12\n\n\x02Gy\x18\x05 \x01(\x05\x12\n\n\x02Gz\x18\x06 \x01(\x05\x12\x11\n\ttimestamp\x18\x07 \x01(\t\"7\n\x0bMoveCommand\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x61rg1\x18\x02 \x01(\x05\x12\x0c\n\x04\x61rg2\x18\x03 \x01(\x05\x42\x0f\x42\x0bstd_packageP\x01\x62\x06proto3'
+  serialized_pb=b'\n\x12message_defs.proto\x12\x19robot_drone_collaboration\"h\n\x0bMPU6050Data\x12\n\n\x02\x41x\x18\x01 \x01(\x02\x12\n\n\x02\x41y\x18\x02 \x01(\x02\x12\n\n\x02\x41z\x18\x03 \x01(\x02\x12\n\n\x02Gx\x18\x04 \x01(\x02\x12\n\n\x02Gy\x18\x05 \x01(\x02\x12\n\n\x02Gz\x18\x06 \x01(\x02\x12\x11\n\ttimestamp\x18\x07 \x01(\t\"7\n\x0bMoveCommand\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x61rg1\x18\x02 \x01(\x05\x12\x0c\n\x04\x61rg2\x18\x03 \x01(\x05\x42\x0f\x42\x0bstd_packageP\x01\x62\x06proto3'
 )
 
 
@@ -33,43 +33,43 @@ _MPU6050DATA = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='Ax', full_name='robot_drone_collaboration.MPU6050Data.Ax', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='Ay', full_name='robot_drone_collaboration.MPU6050Data.Ay', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='Az', full_name='robot_drone_collaboration.MPU6050Data.Az', index=2,
-      number=3, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='Gx', full_name='robot_drone_collaboration.MPU6050Data.Gx', index=3,
-      number=4, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=4, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='Gy', full_name='robot_drone_collaboration.MPU6050Data.Gy', index=4,
-      number=5, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=5, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='Gz', full_name='robot_drone_collaboration.MPU6050Data.Gz', index=5,
-      number=6, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=6, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
