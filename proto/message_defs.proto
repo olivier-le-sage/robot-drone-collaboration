@@ -9,18 +9,18 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_outer_classname = "std_package";
 
-package robot-drone-collaboration;
+package robot_drone_collaboration;
 
 // Message defining a Accelerometer/Gyroscope datapoint
 message MPU6050Data {
     // Accelerometer x, y, z
-    required int32  Ax = 1;
-    required int32  Ay = 2;
-    required int32  Az = 3;
+    int32  Ax = 1;
+    int32  Ay = 2;
+    int32  Az = 3;
     // Gyroscope x, y, z
-    required int32  Gx = 4;
-    required int32  Gy = 5;
-    required int32  Gz = 6;
+    int32  Gx = 4;
+    int32  Gy = 5;
+    int32  Gz = 6;
     // Timestamp (optional)
     string timestamp = 7;
 }
