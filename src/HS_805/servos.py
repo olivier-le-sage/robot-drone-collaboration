@@ -4,6 +4,8 @@ from gpiozero import Servo
 from gpiozero import AngularServo
 import RPi.GPIO as GPIO
 from time import sleep
+from threading import threading.Thread
+from queue import Queue
 
 # set GPIO mode to BCM (NB: not the physical pin numbers)
 GPIO.setmode(GPIO.BOARD)
@@ -53,7 +55,7 @@ RIGHT_ENCODER   = 1
 LEFT_SERVO      = 0
 RIGHT_SERVO     = 1
 
-class ServoControl:
+class ServoControl(Thread):
     '''
         Servo control interface.
         Provides access to high-level servo control methods.
@@ -63,6 +65,9 @@ class ServoControl:
                        right_servo_pin=13,
                        headtilt_servo_pin=27,
                        headrot_servo_pin=22):
+
+        # Queue for movement commands
+        self.cmd_q = Queue()
 
         # NB: Default pin settings are BCM-mode.
         #       physically they're (resp.) 12, 33, 13, 15
@@ -185,3 +190,20 @@ class ServoControl:
         GPIO.cleanup()
 
         return
+
+    def run(self):
+        '''
+            Threading override that defines the thread behaviour of the servo
+            interface.
+
+            CMDs have the format: (funtion name, arg1, arg2, ...)
+            Invalid function names will have no effect.
+        '''
+        while True:
+            if not self.cmd_q.empty():
+                next_cmd = self.cmd_q.get() # cmd should be a tuple
+                function, *args = next_cmd
+                if function in locals():
+                    locals()[function](*args)
+
+            time.sleep(0.1) # slight delay to save resources
