@@ -11,12 +11,13 @@ import time
 import struct
 import threading
 import bluetooth as bt # bluetooth using PyBluez
-# import MQTTSN
 from pprint import pprint
+# import MQTTSN
 
 # Add module scripts one-by-one at runtime
 sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 sys.path.insert(0, 'robot-drone-collaboration/lib') # import lib tree
+sys.path.insert(0, 'robot-drone-collaboratin/proto') # import proto tree
 #sys.path.insert(0, ...)
 
 # import modules
@@ -26,6 +27,8 @@ from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
 import lib
 # import lib.MQTTSN_Python.MQTTSNclient.py
+import proto
+from proto.bin.message_defs_pb2 import *
 
 ########## Constants ##########
 
@@ -37,15 +40,21 @@ RIGHT_SERVO_PIN = 33 # the small replacement servo
 HEADTILT_SERVO_PIN = 27
 HEADROT_SERVO_PIN  = 22
 
+## MQTT-related constants
+# public brokers: https://github.com/mqtt/mqtt.github.io/wiki/public_brokers
+MQTT_HOSTNAME   = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
+GOOGLE_BROKER   = "mqtt.googleapis.com" # Google cloud-based broker
+ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
+ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
+MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
+sub_topics = ["olivier-le-sage/land-robot/#"]
 
-MQTT_HOSTNAME = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
-MQTT_BROKER = MQTT_HOSTNAME # provisionally working
 
 ROBOT_WIDTH = 0.03 # ~30 cm
 ROBOT_HEIGHT = 0.03 # ~30 cm
 
 BLUETOOTH_TGT_NAME = 'LAPTOP-KDBVI58S' # TBD
-BLUETOOTH_TGT_ADDR = None     # TBD
+BLUETOOTH_TGT_ADDR = None # TBD
 
 ########## Initialization ##########
 
@@ -103,11 +112,14 @@ servo_interface.test_run()
 
 # self-test accelerometer/gyroscope by reading some values
 print("===== Testing accelerometer/gyroscope =====")
-print(str(dt.datetime.now()), "Accelerometer: ", mpu6050_interface.get_acc_xyz())
-print(str(dt.datetime.now()), "Gyroscope: ", mpu6050_interface.get_gyr_xyz())
+print(str(dt.datetime.now()),"Accelerometer: ", mpu6050_interface.get_acc_xyz())
+print(str(dt.datetime.now()),"Gyroscope: ", mpu6050_interface.get_gyr_xyz())
 
 # self-test MQTT interface
-mqtt_interface.publish("land-robot/status", "Initialization complete!")
+print("===== Testing MQTT pub-sub =====")
+mqtt_interface.subscribe("olivier-le-sage/land-robot/#")
+mqtt_interface.publish("olivier-le-sage/land-robot/status",
+                            "Initialization complete!")
 
 # self-test ultrasonic sensor (PING sensor)
 
@@ -117,18 +129,44 @@ mqtt_interface.publish("land-robot/status", "Initialization complete!")
 
 # self-test Camera functionality
 
+########## Threads ##########
+
+# start servo interface thread
+servo_interface.start() # will invoke run() in a separate thread
+
 ########## Main Loop ##########
 
-# 1. Retrieve all sensor data using sensor interfaces and C functions
+while True:
 
+    # 1. Retrieve all sensor data using sensor interfaces and C functions
 
-# 2. Publish to MQTT-SN broker
+    # publish acc/gyro data
+    mpu6050_data = message_defs_pb2.MPU6050Data()
+    mpu6050_data.Ax, mpu6050_data.Ay, mpu6050_data.Az = *mpu6050_interface.get_acc_xyz()
+    mpu6050_data.Gx, mpu6050_data.Gy, mpu6050_data.Gz = *mpu6050_interface.get_gyr_xyz()
+    mpu6050_data.timestamp = str(dt.datetime.now())
 
+    # 2. Publish to MQTT broker
 
-# 3. Retrieve any instructions/data arriving on the robot's topics
+    mpu6050_payload = mpu6050_data.SerializeToString()
+    print("Compiled protobuf payload for mpu6050: ", mpu6050_payload) # DEBUG
+    mqtt_interface.publish("olivier-le-sage/land-robot/mpu6050", mpu6050_payload)
 
+    # 3. Retrieve any instructions/data arriving on the robot's topics
 
-# 4. Execute instructions (turn left, stop moving, process path data... etc)
-# 4b. Update robot movement state if necessary (and publish it to MQTT-SN broker)
+    # retrieve from mqtt interface message Queue
+    if not mqtt_interface.message_q.empty():
+        instr = mqtt_interface.message_q.get()
 
-# Rinse and repeat
+        # if the topic is the servo topic, pass the payload to the servo interf
+        if instr[0] == 'olivier-le-sage/land-robot/move':
+            move_cmd = message_defs_pb2.MoveCommand()
+            move_cmd.ParseFromString(instr[1])
+            servo_interface.cmd_q.put((move_cmd.name, move_cmd.arg1, move_cmd.arg2))
+
+        # other topics will have different behaviour (WIP)
+
+    # 4. Execute instructions (turn left, stop moving, process path data... etc)
+    # 4b. Update robot movement state if necessary (and publish it to MQTT-SN broker)
+
+    # Rinse and repeat

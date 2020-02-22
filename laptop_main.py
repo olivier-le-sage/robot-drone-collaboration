@@ -52,5 +52,5 @@ def bluetooth_server():
 
 # Start the bluetooth server
 bt_t = Thread(target=bluetooth_server)
-bt_t.start()
+# bt_t.start()
 print("Bluetooth started.")

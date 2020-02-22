@@ -8,8 +8,11 @@ import paho.mqtt.client as mqtt
 import datetime
 import sys
 import json
+from queue import Queue
 
 DEFAULT_PORT = 1883 # default port for MQTT broker
+GOOGLE_PORT  = 8883 # default port for Google's cloud-based MQTT API
+GOOGLE_ALT_PORT = 443 # alternative port for Google's MQTT API
 
 class MQTTSender:
 
@@ -19,8 +22,9 @@ class MQTTSender:
         self.hostname = hostname # Hostname of the PC hosting the broker on the network
         self.sub_topics = sub_topics
         self.pub_topics = pub_topics
+        self.message_q = Queue() # used to fetch messages in sync
 
-        # Automatically subscribed to any topics passed to sub_topics
+        # Automatically subscribe to any topics passed to sub_topics
         for topic in sub_topics:
             self.subscribe(topic) # warning: not sure if this will work
 
@@ -49,7 +53,9 @@ class MQTTSender:
         pass
 
     def on_message(self, client, userdata, msg):
+        # DEBUG MESSAGE
         print("RECEIVED: {" + msg.payload + "} to topic {" + msg.topic + "}")
+        q.put((msg.topic, msg.payload)) # tuple obj with (topic, payload)
         pass
 
     def on_publish(self, client, userdata, result):
@@ -70,6 +76,9 @@ class MQTTSender:
         pass
 
     def run(self):
+        '''
+            Start the MQTT client.
+        '''
         self.client.on_connect = self.on_connect # function pointers
         self.client.on_publish = self.on_publish
         self.client.on_message = self.on_message
