@@ -4,7 +4,7 @@ from gpiozero import Servo
 from gpiozero import AngularServo
 import RPi.GPIO as GPIO
 from time import sleep
-from threading import threading.Thread
+from threading import Thread
 from queue import Queue
 
 # set GPIO mode to BCM (NB: not the physical pin numbers)
@@ -65,6 +65,9 @@ class ServoControl(Thread):
                        right_servo_pin=13,
                        headtilt_servo_pin=27,
                        headrot_servo_pin=22):
+
+        # Call Thread superclass init()
+        super(ServoControl, self).__init__()
 
         # Queue for movement commands
         self.cmd_q = Queue()
@@ -206,4 +209,4 @@ class ServoControl(Thread):
                 if function in locals():
                     locals()[function](*args)
 
-            time.sleep(0.1) # slight delay to save resources
+            sleep(0.1) # slight delay to save resources

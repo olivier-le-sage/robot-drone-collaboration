@@ -28,7 +28,8 @@ from src.MPU_6050.MPU6050Interface import MPU6050Interface
 import lib
 # import lib.MQTTSN_Python.MQTTSNclient.py
 import proto
-from proto.bin.message_defs_pb2 import *
+import proto.bin.message_defs_pb2 as message_defs_pb2
+
 
 ########## Constants ##########
 
@@ -142,8 +143,8 @@ while True:
 
     # publish acc/gyro data
     mpu6050_data = message_defs_pb2.MPU6050Data()
-    mpu6050_data.Ax, mpu6050_data.Ay, mpu6050_data.Az = *mpu6050_interface.get_acc_xyz()
-    mpu6050_data.Gx, mpu6050_data.Gy, mpu6050_data.Gz = *mpu6050_interface.get_gyr_xyz()
+    mpu6050_data.Ax, mpu6050_data.Ay, mpu6050_data.Az = mpu6050_interface.get_acc_xyz()
+    mpu6050_data.Gx, mpu6050_data.Gy, mpu6050_data.Gz = mpu6050_interface.get_gyr_xyz()
     mpu6050_data.timestamp = str(dt.datetime.now())
 
     # 2. Publish to MQTT broker
