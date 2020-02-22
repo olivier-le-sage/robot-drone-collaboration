@@ -25,10 +25,16 @@ message MPU6050Data {
     string timestamp = 7;
 }
 
-// Message defining a movement command (WIP!)
-message ServoWrite {
-    // Name of the servo (Left, Right, EndEffector...)
+// Message defining a movement command
+// valid commands are the names of functions defined in the
+//      servo interface servos.py:
+//      - "move"
+//      - "pivot_turn_left"
+//      - "pivot_turn_right"
+message MoveCommand {
+    // Name of the command (see above)
     string name = 1;
-    // servo position
-    optional int32  position = 2;
+    // Arguments (optional, not necessarily used)
+    int32 arg1 = 2;
+    int32 arg2 = 3;
 }
