@@ -65,7 +65,7 @@ class MQTTSender:
 
     def publish(self, topic, payload):
         # publish the desired message (WIP)
-        self.client.publish(topic, bytes(payload, 'utf-8'), self.QoS_level)
+        self.client.publish(topic, payload, self.QoS_level)
         self.pub_topics.append(topic)
         pass
 
