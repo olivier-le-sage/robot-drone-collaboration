@@ -44,6 +44,9 @@ class MQTTSender:
 
         # set up the Client
         self.client = mqtt.Client(self.clientID)
+        self.client.on_connect = self.on_connect # function pointers
+        self.client.on_publish = self.on_publish
+        self.client.on_message = self.on_message
 
     # callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
@@ -55,7 +58,7 @@ class MQTTSender:
     def on_message(self, client, userdata, message):
         msg = message
         print("RECEIVED: {" + msg.payload + "} to topic {" + msg.topic + "}")
-        self.message_q.put((msg.topic, msg.payload)) # tuple obj with (topic, payload)
+        self.message_q.put((msg.topic, msg.payload))
 
     def on_publish(self, client, userdata, mid):
         print("PUBLISHED: {" + payload + "} to topic {" + topic + "}")
@@ -70,16 +73,11 @@ class MQTTSender:
         # subscribe to a specific topic
         self.client.subscribe(topic, self.QoS_level)
         self.sub_topics.append(topic)
-        pass
 
     def run(self):
         '''
             Start the MQTT client.
         '''
-        self.client.on_connect = self.on_connect # function pointers
-        self.client.on_publish = self.on_publish
-        self.client.on_message = self.on_message
-
         # we connect asynchronously so that loop_start() will attempt to
         # re-connect in the event of a connection failure
         self.client.connect_async(self.broker, DEFAULT_PORT, 60)
