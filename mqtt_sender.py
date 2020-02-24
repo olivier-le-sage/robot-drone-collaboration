@@ -16,12 +16,13 @@ GOOGLE_ALT_PORT = 443 # alternative port for Google's MQTT API
 
 class MQTTSender:
 
-    def __init__(self, broker="", hostname="", sub_topics=[], pub_topics=[],
-                QoS_level=1):
+    def __init__(self, clientID, broker="", hostname="", sub_topics=[],
+                pub_topics=[], QoS_level=2):
         self.broker = broker # Broker name not yet known
         self.hostname = hostname # Hostname of the PC hosting the broker on the network
         self.sub_topics = sub_topics
         self.pub_topics = pub_topics
+        self.clientID = clientID
         self.message_q = Queue() # used to fetch messages in sync
 
         # Automatically subscribe to any topics passed to sub_topics
@@ -38,18 +39,18 @@ class MQTTSender:
         # * QoS 1: The client sends and re-sends the message until an acknowledgment is
         #     received from the broker. Multiple copies of the message may arrive.
         # * QoS 2: The client and broker perform a four-way handshake to guarantee
-        #     delivery of the message.
+        #     delivery of exactly one message copy.
         self.QoS_level = QoS_level
 
         # set up the Client
-        self.client = mqtt.Client('Garbage Collector')
+        self.client = mqtt.Client(self.clientID)
 
     # callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            print("Connection accepted.")
+            print("[STATUS] MQTT Connection accepted.")
         else:
-            print("Connection failed: result code "+str(rc))
+            print("[ERROR] MQTT Connection failed: result code "+str(rc))
         pass
 
     def on_message(self, client, userdata, msg):

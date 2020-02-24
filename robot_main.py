@@ -48,6 +48,7 @@ GOOGLE_BROKER   = "mqtt.googleapis.com" # Google cloud-based broker
 ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
 ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
 MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
+MQTT_CLIENT_ID  = '9de151a4906d46f5beacb41d86e036a2' # random md5 hash
 sub_topics = ["olivier-le-sage/land-robot/#"]
 
 
@@ -102,7 +103,7 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
                                HEADROT_SERVO_PIN)
 
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
-mqtt_interface = MQTTSender(MQTT_BROKER, MQTT_HOSTNAME)
+mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
 mqtt_interface.run() # start mqtt client thread in bg
 
 ########## Self-Tests/Diagnostics ##########
@@ -150,7 +151,7 @@ while True:
     # 2. Publish to MQTT broker
 
     mpu6050_payload = mpu6050_data.SerializeToString()
-    print("Compiled protobuf payload for mpu6050: ", mpu6050_payload) # DEBUG
+    # print("Compiled protobuf payload for mpu6050: ", mpu6050_payload) # DEBUG
     mqtt_interface.publish("olivier-le-sage/land-robot/mpu6050", mpu6050_payload)
 
     # 3. Retrieve any instructions/data arriving on the robot's topics
