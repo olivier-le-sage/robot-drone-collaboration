@@ -171,3 +171,4 @@ while True:
     # 4b. Update robot movement state if necessary (and publish it to MQTT-SN broker)
 
     # Rinse and repeat
+    time.sleep(1) # For demo purposes we'll insert a second here to avoid flooding
