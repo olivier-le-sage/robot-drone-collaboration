@@ -22,9 +22,10 @@ sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 sys.path.insert(0, 'robot-drone-collaboration/lib') # import lib tree
 
 import lib
-import lib.MQTTSN_Python.MQTTSN
+# import lib.MQTTSN_Python.MQTTSN
 #import MQTTSN # this import fails because the module isn't found
 from mqtt_sender import MQTTSender
+import paho.mqtt.client as mqtt
 import proto
 import proto.bin.message_defs_pb2 as message_defs_pb2
 
@@ -37,6 +38,8 @@ ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
 ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
 MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
 MQTT_CLIENT_ID = '7061fe2823fe4375bcdadfbf14f184c8' # random md5 hash
+
+SUB_TOPICS = ['olivier-le-sage/land-robot/move']
 
 ####### Bluetooth server ######
 
@@ -66,8 +69,10 @@ bt_t = Thread(target=bluetooth_server)
 print("Bluetooth started.")
 
 # initialize MQTT Client
-mqtt_client = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
-mqtt_client.run()
+mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,
+                                sub_topics=SUB_TOPICS)
+# mqtt_interface.subscribe("olivier-le-sage/land-robot/move")
+mqtt_interface.start() # run mqtt_interface as a thread
 
 # For now we'll keep it simple -- a while loop where the user decides which
 #     command to send to the robot
@@ -78,39 +83,44 @@ print("3 - Turn left.")
 print("4 - Turn right.")
 print("5 - Neutral (stop).")
 while True:
+
+    # Check for any messages received
+    if not mqtt_interface.message_q.empty():
+        print("There's a message in the queue! Received: ",str(message_q.get()))
+
     command = input("Enter command: ")
     if command == "1":
         robot_cmd = message_defs_pb2.MoveCommand()
         robot_cmd.name = 'move'
         robot_cmd.arg1 = 5
-        mqtt_client.publish('olivier-le-sage/land-robot/move',
+        mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())
         print("move() command sent.")
     elif command == "2":
         robot_cmd = message_defs_pb2.MoveCommand()
         robot_cmd.name = 'move'
         robot_cmd.arg1 = 5
-        mqtt_client.publish('olivier-le-sage/land-robot/move',
+        mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())
         print("move() command sent.")
     elif command == "3":
         robot_cmd = message_defs_pb2.MoveCommand()
         robot_cmd.name = 'pivot_turn_left'
         robot_cmd.arg1 = 5
-        mqtt_client.publish('olivier-le-sage/land-robot/move',
+        mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())
         print("pivot_turn_left() command sent.")
     elif command == "4":
         robot_cmd = message_defs_pb2.MoveCommand()
         robot_cmd.name = 'pivot_turn_right'
         robot_cmd.arg1 = 5
-        mqtt_client.publish('olivier-le-sage/land-robot/move',
+        mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())
         print("pivot_turn_right() command sent.")
     elif command == "5":
         robot_cmd = message_defs_pb2.MoveCommand()
         robot_cmd.name = 'neutral'
-        mqtt_client.publish('olivier-le-sage/land-robot/move',
+        mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())
         print("pivot_turn_right() command sent.")
     else:
