@@ -66,12 +66,12 @@ class MQTTSender:
 
     def publish(self, topic, payload):
         # publish the desired message (WIP)
-        self.client.publish(topic, payload, self.QoS_level)
+        self.client.publish(topic, payload=payload, qos=self.QoS_level)
         self.pub_topics.append(topic)
 
     def subscribe(self, topic):
         # subscribe to a specific topic
-        self.client.subscribe(topic, self.QoS_level)
+        self.client.subscribe(topic, qos=self.QoS_level)
         self.sub_topics.append(topic)
 
     def run(self):
