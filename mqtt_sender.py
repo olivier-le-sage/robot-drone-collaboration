@@ -51,24 +51,20 @@ class MQTTSender:
             print("[STATUS] MQTT Connection accepted.")
         else:
             print("[ERROR] MQTT Connection failed: result code "+str(rc))
-        pass
 
-    def on_message(self, client, userdata, msg):
-        # DEBUG MESSAGE
+    def on_message(self, client, userdata, message):
+        msg = message
         print("RECEIVED: {" + msg.payload + "} to topic {" + msg.topic + "}")
-        q.put((msg.topic, msg.payload)) # tuple obj with (topic, payload)
-        pass
+        self.message_q.put((msg.topic, msg.payload)) # tuple obj with (topic, payload)
 
-    def on_publish(self, client, userdata, result):
+    def on_publish(self, client, userdata, mid):
         print("PUBLISHED: {" + payload + "} to topic {" + topic + "}")
         print("Payload had a length of: " + len(payload))
-        pass
 
     def publish(self, topic, payload):
         # publish the desired message (WIP)
         self.client.publish(topic, payload, self.QoS_level)
         self.pub_topics.append(topic)
-        pass
 
     def subscribe(self, topic):
         # subscribe to a specific topic
