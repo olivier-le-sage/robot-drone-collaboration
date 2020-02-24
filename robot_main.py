@@ -47,7 +47,8 @@ MQTT_HOSTNAME   = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
 GOOGLE_BROKER   = "mqtt.googleapis.com" # Google cloud-based broker
 ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
 ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
-MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
+SPENCER_BROKER = "192.168.137.1" # IP of the local broker
+MQTT_BROKER     = SPENCER_BROKER # provisionally working
 MQTT_CLIENT_ID  = '9de151a4906d46f5beacb41d86e036a2' # random md5 hash
 sub_topics = ["olivier-le-sage/land-robot/#"]
 
