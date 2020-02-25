@@ -4,6 +4,7 @@
 import time
 import datetime as dt
 import RPi.GPIO as GPIO
+from threading import Thread
 from queue import Queue
 
 # Due to its time-sensitive nature we run this sensor in its own thread
@@ -17,7 +18,7 @@ class Ultrasonic(Thread):
         # Call thread superclass constructor
         super(Ultrasonic, self).__init__()
 
-        self.ctrl_pin = trig_pin
+        self.trig_pin = trig_pin
         self.period = period # gives the delay (in s) between pings when running
         self.ping_q = Queue()
 
@@ -31,8 +32,10 @@ class Ultrasonic(Thread):
         return distance
 
     def read_distance(self):
+
+       GPIO.setmode(GPIO.BOARD)
        GPIO.setup(self.trig_pin, GPIO.OUT)
-       GPIO.output(self.trig_pin), 0)
+       GPIO.output(self.trig_pin, 0)
        time.sleep(0.000002)
 
        #send trigger signal
@@ -44,16 +47,20 @@ class Ultrasonic(Thread):
 
        GPIO.setup(self.trig_pin, GPIO.IN)
 
-
-       while GPIO.input(pin)==0:
+       starttime = 0
+       endtime = 0
+       while GPIO.input(self.trig_pin)==0:
           starttime=time.time()
 
-       while GPIO.input(pin)==1:
+       while GPIO.input(self.trig_pin)==1:
           endtime=time.time()
 
        duration=endtime-starttime
        # Distance is defined as time/2 (there and back) * speed of sound 34000 cm/s
        distance=duration*34000/2
+
+       GPIO.cleanup()
+
        return distance
 
     def run(self):
@@ -65,4 +72,4 @@ class Ultrasonic(Thread):
             dist = self.read_distance()
             timestamp = str(dt.datetime.now())
             self.ping_q.put((dist, timestamp))
-            sleep(self.period)
+            time.sleep(self.period)

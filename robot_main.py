@@ -25,7 +25,7 @@ from mqtt_sender import MQTTSender
 import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
-from src.
+import src.Ping_Ultrasonic.PING_Ultrasonic as ping
 import lib
 # import lib.MQTTSN_Python.MQTTSNclient.py
 import proto
@@ -106,9 +106,9 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
                                HEADROT_SERVO_PIN)
 
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
-ping_interface = Ultrasonic(PING_TRIG_PIN) # initialize PING sensor interface
+ping_interface = ping.Ultrasonic(PING_TRIG_PIN) # initialize PING sensor interface
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
-mqtt_interface.run() # start mqtt client thread in bg
+mqtt_interface.start() # start mqtt client thread in bg
 
 ########## Self-Tests/Diagnostics ##########
 
