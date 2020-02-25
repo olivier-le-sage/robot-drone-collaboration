@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='robot_drone_collaboration',
   syntax='proto3',
   serialized_options=b'B\013std_packageP\001',
-  serialized_pb=b'\n\x12message_defs.proto\x12\x19robot_drone_collaboration\"h\n\x0bMPU6050Data\x12\n\n\x02\x41x\x18\x01 \x01(\x02\x12\n\n\x02\x41y\x18\x02 \x01(\x02\x12\n\n\x02\x41z\x18\x03 \x01(\x02\x12\n\n\x02Gx\x18\x04 \x01(\x02\x12\n\n\x02Gy\x18\x05 \x01(\x02\x12\n\n\x02Gz\x18\x06 \x01(\x02\x12\x11\n\ttimestamp\x18\x07 \x01(\t\"7\n\x0bMoveCommand\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x61rg1\x18\x02 \x01(\x05\x12\x0c\n\x04\x61rg2\x18\x03 \x01(\x05\x42\x0f\x42\x0bstd_packageP\x01\x62\x06proto3'
+  serialized_pb=b'\n\x12message_defs.proto\x12\x19robot_drone_collaboration\"h\n\x0bMPU6050Data\x12\n\n\x02\x41x\x18\x01 \x01(\x02\x12\n\n\x02\x41y\x18\x02 \x01(\x02\x12\n\n\x02\x41z\x18\x03 \x01(\x02\x12\n\n\x02Gx\x18\x04 \x01(\x02\x12\n\n\x02Gy\x18\x05 \x01(\x02\x12\n\n\x02Gz\x18\x06 \x01(\x02\x12\x11\n\ttimestamp\x18\x07 \x01(\t\"7\n\x0bMoveCommand\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x61rg1\x18\x02 \x01(\x05\x12\x0c\n\x04\x61rg2\x18\x03 \x01(\x05\"/\n\x0cPINGDistance\x12\x0c\n\x04\x64ist\x18\x01 \x01(\x01\x12\x11\n\ttimestamp\x18\x02 \x01(\tB\x0f\x42\x0bstd_packageP\x01\x62\x06proto3'
 )
 
 
@@ -141,8 +141,47 @@ _MOVECOMMAND = _descriptor.Descriptor(
   serialized_end=210,
 )
 
+
+_PINGDISTANCE = _descriptor.Descriptor(
+  name='PINGDistance',
+  full_name='robot_drone_collaboration.PINGDistance',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='dist', full_name='robot_drone_collaboration.PINGDistance.dist', index=0,
+      number=1, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='timestamp', full_name='robot_drone_collaboration.PINGDistance.timestamp', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=212,
+  serialized_end=259,
+)
+
 DESCRIPTOR.message_types_by_name['MPU6050Data'] = _MPU6050DATA
 DESCRIPTOR.message_types_by_name['MoveCommand'] = _MOVECOMMAND
+DESCRIPTOR.message_types_by_name['PINGDistance'] = _PINGDISTANCE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 MPU6050Data = _reflection.GeneratedProtocolMessageType('MPU6050Data', (_message.Message,), {
@@ -158,6 +197,13 @@ MoveCommand = _reflection.GeneratedProtocolMessageType('MoveCommand', (_message.
   # @@protoc_insertion_point(class_scope:robot_drone_collaboration.MoveCommand)
   })
 _sym_db.RegisterMessage(MoveCommand)
+
+PINGDistance = _reflection.GeneratedProtocolMessageType('PINGDistance', (_message.Message,), {
+  'DESCRIPTOR' : _PINGDISTANCE,
+  '__module__' : 'message_defs_pb2'
+  # @@protoc_insertion_point(class_scope:robot_drone_collaboration.PINGDistance)
+  })
+_sym_db.RegisterMessage(PINGDistance)
 
 
 DESCRIPTOR._options = None
