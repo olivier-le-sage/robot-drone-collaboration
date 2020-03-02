@@ -25,6 +25,7 @@ from mqtt_sender import MQTTSender
 import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
+import src.Ping_Ultrasonic.PING_Ultrasonic as ping
 import lib
 # import lib.MQTTSN_Python.MQTTSNclient.py
 import proto
@@ -40,6 +41,7 @@ RIGHT_SERVO_PIN = 33 # the small replacement servo
 # HEADROT_SERVO_PIN = 15 # the small replacement servo
 HEADTILT_SERVO_PIN = 27
 HEADROT_SERVO_PIN  = 22
+PING_TRIG_PIN = 11 # or GPIO17 in BCM mode
 
 ## MQTT-related constants
 # public brokers: https://github.com/mqtt/mqtt.github.io/wiki/public_brokers
@@ -47,7 +49,8 @@ MQTT_HOSTNAME   = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
 GOOGLE_BROKER   = "mqtt.googleapis.com" # Google cloud-based broker
 ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
 ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
-MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
+SPENCER_BROKER = "192.168.137.1" # IP of the local broker
+MQTT_BROKER     = SPENCER_BROKER # provisionally working
 MQTT_CLIENT_ID  = '9de151a4906d46f5beacb41d86e036a2' # random md5 hash
 sub_topics = ["olivier-le-sage/land-robot/#"]
 
@@ -103,8 +106,9 @@ servo_interface = ServoControl(LEFT_SERVO_PIN,
                                HEADROT_SERVO_PIN)
 
 mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
+ping_interface = ping.Ultrasonic(PING_TRIG_PIN) # initialize PING sensor interface
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
-mqtt_interface.run() # start mqtt client thread in bg
+mqtt_interface.start() # start mqtt client thread in bg
 
 ########## Self-Tests/Diagnostics ##########
 
@@ -124,6 +128,8 @@ mqtt_interface.publish("olivier-le-sage/land-robot/status",
                             "Initialization complete!")
 
 # self-test ultrasonic sensor (PING sensor)
+print("===== Testing PING sensor =====")
+ping_interface.single_test()
 
 # self-test GPS reading
 
@@ -136,23 +142,34 @@ mqtt_interface.publish("olivier-le-sage/land-robot/status",
 # start servo interface thread
 servo_interface.start() # will invoke run() in a separate thread
 
+# start ultrasonic ping sensor thread
+ping_interface.start()
+
 ########## Main Loop ##########
 
 while True:
 
     # 1. Retrieve all sensor data using sensor interfaces and C functions
 
-    # publish acc/gyro data
+    # retrieve acc/gyro data
     mpu6050_data = message_defs_pb2.MPU6050Data()
     mpu6050_data.Ax, mpu6050_data.Ay, mpu6050_data.Az = mpu6050_interface.get_acc_xyz()
     mpu6050_data.Gx, mpu6050_data.Gy, mpu6050_data.Gz = mpu6050_interface.get_gyr_xyz()
     mpu6050_data.timestamp = str(dt.datetime.now())
 
-    # 2. Publish to MQTT broker
+    # retrieve ping sensor data
+    ping_payload = None
+    if not ping_interface.ping_q.empty():
+        ping_data = message_defs_pb2.PINGDistance()
+        ping_data.dist, ping_data.timestamp = ping_interface.ping_q.get()
+        ping_payload = ping_data.SerializeToString()
 
+    # 2. Publish to MQTT broker
     mpu6050_payload = mpu6050_data.SerializeToString()
     # print("Compiled protobuf payload for mpu6050: ", mpu6050_payload) # DEBUG
     mqtt_interface.publish("olivier-le-sage/land-robot/mpu6050", mpu6050_payload)
+    if ping_payload is not None:
+        mqtt_interface.publish("olivier-le-sage/land-robot/ping", ping_payload)
 
     # 3. Retrieve any instructions/data arriving on the robot's topics
 

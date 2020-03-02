@@ -38,3 +38,12 @@ message MoveCommand {
     int32 arg1 = 2;
     int32 arg2 = 3;
 }
+
+// Message defining a distance measurement from the PING sensor
+message PINGDistance {
+    // the distance as a float
+    double dist = 1;
+
+    // timestamp (optional but important)
+    string timestamp = 2;
+}
