@@ -19,7 +19,7 @@ import matplotlib.patches as patches
 # This function sets up and runs the object detection
 def main():
 
-	# Root directory of the project. 
+	# Root directory of the project.
 	# Change in case you want to put the notebook somewhere else.
 	ROOT_DIR = os.getcwd()
 	print(ROOT_DIR)
@@ -54,7 +54,7 @@ def main():
 	    IMAGES_PER_GPU = 1
 
 	# Device to load the neural network on.
-	# Useful if you're training a model on the same 
+	# Useful if you're training a model on the same
 	# machine, in which case use CPU and leave the
 	# GPU for training.
 	DEVICE = "/cpu:0"  # /cpu:0 or /gpu:0
@@ -80,7 +80,7 @@ def main():
 	model.load_weights(weights_path, by_name=True)
 
 	# Get images from the directory of all the test images
-	#TODO: This should be changed to the directory where the desired images are stored 
+	#TODO: This should be changed to the directory where the desired images are stored
 
 	jpg = glob.glob("images2/*.jpg")
 	jpeg = glob.glob("images2/*.jpeg")
@@ -117,7 +117,7 @@ def main():
 		#--------------------------------------------------------------------------
 	    currentPoint = [(550,2000)]
 	    listOfPoints.append(currentPoint[0])
-	    
+
 	    # Loop through all the detected objects. For each object, store the point determined to
 	    # be closest to currentPoint
 	    while(mask.shape[2] != 0):
@@ -131,9 +131,9 @@ def main():
 	            listOfShortest.append([shortestPoint,distanceToPoint,i]) # Add the point to a list of shortest. This can be changed later to just replace the stored value if the new one is closer.
 	            image = image_temp
 	            temp = skimage.io.imread('{}'.format(image))
-	            
 
-	        # Print the list of points for each object, calulcate which object is closest to 
+
+	        # Print the list of points for each object, calulcate which object is closest to
 	        # currentPoint, add it to the listOfPoints and then set it as the new currentPoint
 
 	        currentPoint
@@ -144,7 +144,7 @@ def main():
 	        mask = np.delete(mask,absoluteShortest[2], 2)
 	        currentPoint = [(absoluteShortest[0][0],absoluteShortest[0][1])]
 	        listOfPoints.append(currentPoint[0])
-        
+
 	    # Display final results
 	    print(listOfPoints)
 	    image = image_temp
@@ -155,4 +155,6 @@ def main():
 	    plt.scatter(y, x)
 	    plt.plot(y,x,linewidth=3)
 	    plt.show()
-		            
+
+if __name__ == '__main__':
+	main()
