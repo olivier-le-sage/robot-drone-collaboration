@@ -36,12 +36,15 @@ class Ultrasonic(Thread):
        GPIO.setmode(GPIO.BOARD)
        GPIO.setup(self.trig_pin, GPIO.OUT)
        GPIO.output(self.trig_pin, 0)
+       
        time.sleep(0.000002)
+       #time.sleep(0.05)
 
        #send trigger signal
        GPIO.output(self.trig_pin, 1)
 
        time.sleep(0.000005)
+       #time.sleep(0.05)
 
        GPIO.output(self.trig_pin, 0)
 
@@ -55,7 +58,13 @@ class Ultrasonic(Thread):
        while GPIO.input(self.trig_pin)==1:
           endtime=time.time()
 
-       duration=endtime-starttime
+       duration = endtime - starttime
+       if (starttime == 0) or (endtime == 0):
+           GPIO.cleanup()
+           return -1
+       #print("starttime=",starttime)
+       #print("endtime=",endtime)
+       #print("Duration=",duration)
        # Distance is defined as time/2 (there and back) * speed of sound 34000 cm/s
        distance=duration*34000/2
 

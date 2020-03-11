@@ -22,6 +22,7 @@ sys.path.insert(0, 'robot-drone-collaboratin/proto') # import proto tree
 
 # import modules
 from mqtt_sender import MQTTSender
+import paho.mqtt.client as mqtt
 import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
@@ -51,7 +52,7 @@ ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
 ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
 SPENCER_BROKER  = "192.168.137.1" # IP of the local broker on Spencer's computer
 LOCAL_BROKER    = "localhost"
-MQTT_BROKER     = LOCAL_BROKER # provisionally working
+MQTT_BROKER     = SPENCER_BROKER # provisionally working
 MQTT_CLIENT_ID  = '9de151a4906d46f5beacb41d86e036a2' # random md5 hash
 MQTT_CLIENT_ID2 = '9de151a4906d46f5ceacb41d96e036a3' # random md5 hash
 sub_topics = ["olivier-le-sage/land-robot/#"]
@@ -135,16 +136,20 @@ def interpret_command(client, userdata, message):
     # pass the payload to the servo interface
     move_cmd = message_defs_pb2.MoveCommand()
     move_cmd.ParseFromString(message.payload)
+    # print("Command received ", move_cmd)
     servo_interface.cmd_q.put((move_cmd.name, move_cmd.arg1, move_cmd.arg2))
 
 # Temporary client for the demo
+servo_interface.start() # TEMPORARY
 mqttc = mqtt.Client(MQTT_CLIENT_ID2)
 mqttc.on_publish = on_publish
 mqttc.on_connect = on_connect
 mqttc.on_subscribe = on_subscribe
 mqttc.message_callback_add('olivier-le-sage/land-robot/move', interpret_command)
 mqttc.connect(MQTT_BROKER, 1883, 60)
-mqttc.loop_start()
+mqttc.subscribe('olivier-le-sage/land-robot/move')
+mqttc.publish('olivier-le-sage/land-robot/status', 'mqttc online!')
+mqttc.loop_forever()
 
 ########## Self-Tests/Diagnostics ##########
 
@@ -176,7 +181,7 @@ ping_interface.single_test()
 ########## Threads ##########
 
 # start servo interface thread
-servo_interface.start() # will invoke run() in a separate thread
+# servo_interface.start() # will invoke run() in a separate thread
 
 # start ultrasonic ping sensor thread
 ping_interface.start()

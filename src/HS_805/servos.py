@@ -40,8 +40,10 @@ HS_785_DC_NEUT = 7.0 # UNKNOWN -- theoretical expectation
 #   pigs s 18 1500 # centre
 #   pigs s 18 2000 # clockwise
 #   pigs s 18 0 # switch servo pulses off
-HS_805_DC_NEUT  = 6.18 #6.55 # 1310 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
+HS_805_DC_NEUT = 6.18 #6.55 # 1310 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
 HS_785_DC_NEUT = 7.62  #8.0 # 1600 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
+HS_805_DC_NEUT = 6.25
+HS_785_DC_NEUT = 7.71
 
 # The two different servos have different duty cycle requirements
 RIGHT_DC = HS_785_DC_NEUT
@@ -120,8 +122,8 @@ class ServoControl(Thread):
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
-        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
-        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-1)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+1)
         sleep(seconds) # sleep for the right amount of time to reach distance cm
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
@@ -204,9 +206,19 @@ class ServoControl(Thread):
         '''
         while True:
             if not self.cmd_q.empty():
+                print("Servos received a message!")
                 next_cmd = self.cmd_q.get() # cmd should be a tuple
                 function, *args = next_cmd
-                if function in locals():
-                    locals()[function](*args)
+                #print("Servos found ", function, " with args ", args, " in queue")
+                if function.strip() in globals():
+                    globals()[function](*args)
+                else:
+                    if function.strip() == 'move':
+                        self.move(args[0])
+                    elif function.strip() == 'pivot_turn_left':
+                        self.pivot_turn_left(args[0])
+                    elif function.strip() == 'pivot_turn_right':
+                        self.pivot_turn_right(args[0])
+                    elif function.strip() == 'neutral':
+                        self.neutral()
 
-            sleep(0.1) # slight delay to save resources
