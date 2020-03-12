@@ -54,10 +54,6 @@ MQTT_BROKER     = SPENCER_BROKER # provisionally working
 MQTT_CLIENT_ID  = '9de151a4906d46f5beacb41d86e036a2' # random md5 hash
 sub_topics = ["olivier-le-sage/land-robot/#"]
 
-
-ROBOT_WIDTH = 0.03 # ~30 cm
-ROBOT_HEIGHT = 0.03 # ~30 cm
-
 BLUETOOTH_TGT_NAME = 'LAPTOP-KDBVI58S' # TBD
 BLUETOOTH_TGT_ADDR = None # TBD
 

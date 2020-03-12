@@ -92,14 +92,14 @@ while True:
     command = input("Enter command: ")
     if command == "1":
         robot_cmd = message_defs_pb2.MoveCommand()
-        robot_cmd.name = 'move'
+        robot_cmd.name = 'move_forward'
         robot_cmd.arg1 = 5
         mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())
         print("move() command sent.")
     elif command == "2":
         robot_cmd = message_defs_pb2.MoveCommand()
-        robot_cmd.name = 'move'
+        robot_cmd.name = 'move_backward'
         robot_cmd.arg1 = 5
         mqtt_interface.publish('olivier-le-sage/land-robot/move',
                                 robot_cmd.SerializeToString())

@@ -113,15 +113,39 @@ class ServoControl(Thread):
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
         return
 
-    def move(self, seconds):
+    def halt(self):
         '''
-            move forward/backward by distance centimeters (negative for backward)
+            Forced stop.
+            Use in case neutral() doesn't work as intended.
+            Brings the PWM outputs down to zero.
+        '''
+        self.left_servo_ctrl.ChangeDutyCycle(0)
+        self.right_servo_ctrl.ChangeDutyCycle(0)
+        return
+
+    def move_forward(self, seconds):
+        '''
+            move forward by distance centimeters (negative for backward)
         '''
 
         # self.left_servo.angle = degrees
         # self.right_servo.angle = degrees
-        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-0.5)
-        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+0.5)
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC-1.0)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC+1.0)
+        sleep(seconds) # sleep for the right amount of time to reach distance cm
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
+        return
+
+    def move_backward(self, seconds):
+        '''
+            move forward by distance centimeters (negative for backward)
+        '''
+
+        # self.left_servo.angle = degrees
+        # self.right_servo.angle = degrees
+        self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC+1.0)
+        self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC-1.0)
         sleep(seconds) # sleep for the right amount of time to reach distance cm
         self.left_servo_ctrl.ChangeDutyCycle(LEFT_DC)
         self.right_servo_ctrl.ChangeDutyCycle(RIGHT_DC)
@@ -199,7 +223,7 @@ class ServoControl(Thread):
             Threading override that defines the thread behaviour of the servo
             interface.
 
-            CMDs have the format: (funtion name, arg1, arg2, ...)
+            CMDs have the format: (function name, arg1, arg2, ...)
             Invalid function names will have no effect.
         '''
         while True:
