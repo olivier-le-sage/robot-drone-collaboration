@@ -113,7 +113,7 @@ ping_interface = ping.Ultrasonic(PING_TRIG_PIN) # initialize PING sensor interfa
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
 mqtt_interface.start() # start mqtt client thread in bg
 
-##### Feb 25 Demo temporary code ###########
+##### Demo (temporary) code ###########
 
 def on_publish(client, userdata, mid):
     print("PUBLISHED")
@@ -140,7 +140,6 @@ def interpret_command(client, userdata, message):
     servo_interface.cmd_q.put((move_cmd.name, move_cmd.arg1, move_cmd.arg2))
 
 # Temporary client for the demo
-servo_interface.start() # TEMPORARY
 mqttc = mqtt.Client(MQTT_CLIENT_ID2)
 mqttc.on_publish = on_publish
 mqttc.on_connect = on_connect
@@ -149,7 +148,7 @@ mqttc.message_callback_add('olivier-le-sage/land-robot/move', interpret_command)
 mqttc.connect(MQTT_BROKER, 1883, 60)
 mqttc.subscribe('olivier-le-sage/land-robot/move')
 mqttc.publish('olivier-le-sage/land-robot/status', 'mqttc online!')
-mqttc.loop_forever()
+mqttc.loop_start()
 
 ########## Self-Tests/Diagnostics ##########
 
@@ -181,7 +180,7 @@ ping_interface.single_test()
 ########## Threads ##########
 
 # start servo interface thread
-# servo_interface.start() # will invoke run() in a separate thread
+servo_interface.start() # will invoke run() in a separate thread
 
 # start ultrasonic ping sensor thread
 ping_interface.start()

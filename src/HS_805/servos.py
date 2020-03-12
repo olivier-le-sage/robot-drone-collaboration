@@ -213,12 +213,15 @@ class ServoControl(Thread):
                 if function.strip() in globals():
                     globals()[function](*args)
                 else:
-                    if function.strip() == 'move':
-                        self.move(args[0])
+                    if function.strip() == 'move_forward':
+                        self.move_forward(args[0])
+                    elif function.strip() == 'move_backward':
+                        self.move_backward(args[0])
                     elif function.strip() == 'pivot_turn_left':
                         self.pivot_turn_left(args[0])
                     elif function.strip() == 'pivot_turn_right':
                         self.pivot_turn_right(args[0])
                     elif function.strip() == 'neutral':
                         self.neutral()
-
+                    elif function.strip() == 'halt':
+                        self.halt()
