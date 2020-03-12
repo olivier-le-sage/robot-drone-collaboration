@@ -45,7 +45,7 @@ class MPU6050Interface:
         self.bus.write_byte_data(MPU_ADDR, GYRO_CONFIG, 24)
         self.bus.write_byte_data(MPU_ADDR, INT_ENABLE, 0x01)
 
-    def read_raw_data(addr):
+    def read_raw_data(self, addr):
         ''' returns a 16-bit value from a certain address '''
         high_byte = self.bus.read_byte_data(MPU_ADDR, addr)
         low_byte = self.bus.read_byte_data(MPU_ADDR, addr+1)
@@ -54,9 +54,9 @@ class MPU6050Interface:
 
     def get_acc_xyz(self):
         ''' returns accelerometer readings in g '''
-        Ax = self.bus.read_raw_data(ACCEL_XOUT_H)
-        Ay = self.bus.read_raw_data(ACCEL_YOUT_H)
-        Az = self.bus.read_raw_data(ACCEL_ZOUT_H)
+        Ax = self.read_raw_data(ACCEL_XOUT_H)
+        Ay = self.read_raw_data(ACCEL_YOUT_H)
+        Az = self.read_raw_data(ACCEL_ZOUT_H)
 
         # divide by sensitivity scale factor
         Ax /= 16384
@@ -67,9 +67,9 @@ class MPU6050Interface:
 
     def get_gyr_xyz(self):
         ''' returns accelerometer readings in g '''
-        Gx = self.bus.read_raw_data(GYRO_XOUT_H)
-        Gy = self.bus.read_raw_data(GYRO_YOUT_H)
-        Gz = self.bus.read_raw_data(GYRO_ZOUT_H)
+        Gx = self.read_raw_data(GYRO_XOUT_H)
+        Gy = self.read_raw_data(GYRO_YOUT_H)
+        Gz = self.read_raw_data(GYRO_ZOUT_H)
 
         # divide by sensitivity scale factor
         Gx /= 131
