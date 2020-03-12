@@ -22,6 +22,7 @@ sys.path.insert(0, 'robot-drone-collaboratin/proto') # import proto tree
 
 # import modules
 from mqtt_sender import MQTTSender
+import paho.mqtt.client as mqtt
 import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
@@ -49,9 +50,11 @@ MQTT_HOSTNAME   = 'LAPTOP-KDBVI58S' # hostname/IP of computer hosting the broker
 GOOGLE_BROKER   = "mqtt.googleapis.com" # Google cloud-based broker
 ECLIPSE_BROKER  = "mqtt.eclipse.org" # Public Eclipse MQTT broker
 ECLIPSE_BROKER2 = "iot.eclipse.org" # (Other) public Eclipse MQTT broker
-SPENCER_BROKER = "192.168.137.1" # IP of the local broker
+SPENCER_BROKER  = "192.168.137.1" # IP of the local broker on Spencer's computer
+LOCAL_BROKER    = "localhost"
 MQTT_BROKER     = SPENCER_BROKER # provisionally working
 MQTT_CLIENT_ID  = '9de151a4906d46f5beacb41d86e036a2' # random md5 hash
+MQTT_CLIENT_ID2 = '9de151a4906d46f5ceacb41d96e036a3' # random md5 hash
 sub_topics = ["olivier-le-sage/land-robot/#"]
 
 BLUETOOTH_TGT_NAME = 'LAPTOP-KDBVI58S' # TBD
@@ -105,6 +108,43 @@ mpu6050_interface = MPU6050Interface() # initialize acc/gyro interface
 ping_interface = ping.Ultrasonic(PING_TRIG_PIN) # initialize PING sensor interface
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
 mqtt_interface.start() # start mqtt client thread in bg
+
+##### Demo (temporary) code ###########
+
+def on_publish(client, userdata, mid):
+    print("PUBLISHED")
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("[STATUS] MQTT Connection accepted.")
+    else:
+        print("[ERROR] MQTT Connection failed: result code "+str(rc))
+
+def on_subscribe(client, userdata, mid, granted_qos):
+    print("SUBSCRIBED successfully")
+def on_message(client, userdata, message):
+    print("RECEIVED a message on ", message.topic)
+def interpret_command(client, userdata, message):
+    '''Callback for messages received on olivier-le-sage/land-robot/move'''
+
+    # DEBUG message
+    print("INTERPRETING message received on olivier-le-sage/land-robot/move!")
+
+    # pass the payload to the servo interface
+    move_cmd = message_defs_pb2.MoveCommand()
+    move_cmd.ParseFromString(message.payload)
+    # print("Command received ", move_cmd)
+    servo_interface.cmd_q.put((move_cmd.name, move_cmd.arg1, move_cmd.arg2))
+
+# Temporary client for the demo
+mqttc = mqtt.Client(MQTT_CLIENT_ID2)
+mqttc.on_publish = on_publish
+mqttc.on_connect = on_connect
+mqttc.on_subscribe = on_subscribe
+mqttc.message_callback_add('olivier-le-sage/land-robot/move', interpret_command)
+mqttc.connect(MQTT_BROKER, 1883, 60)
+mqttc.subscribe('olivier-le-sage/land-robot/move')
+mqttc.publish('olivier-le-sage/land-robot/status', 'mqttc online!')
+mqttc.loop_start()
 
 ########## Self-Tests/Diagnostics ##########
 

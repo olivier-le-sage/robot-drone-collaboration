@@ -40,8 +40,10 @@ HS_785_DC_NEUT = 7.0 # UNKNOWN -- theoretical expectation
 #   pigs s 18 1500 # centre
 #   pigs s 18 2000 # clockwise
 #   pigs s 18 0 # switch servo pulses off
-HS_805_DC_NEUT  = 6.18 #6.55 # 1310 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
-HS_785_DC_NEUT = 7.62  #8.0 # 1600 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
+HS_805_DC_NEUT = 6.18 #6.55 # 1310 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
+HS_785_DC_NEUT = 7.62 #8.0 # 1600 usec @50Hz -- THE TRUE, EXACT, NEUTRAL
+HS_805_DC_NEUT = 6.25 # New experimentally obtained value from the demo
+HS_785_DC_NEUT = 7.71 # New experimentally obtained value from the demo
 
 # The two different servos have different duty cycle requirements
 RIGHT_DC = HS_785_DC_NEUT
@@ -228,9 +230,22 @@ class ServoControl(Thread):
         '''
         while True:
             if not self.cmd_q.empty():
+                print("Servos received a message!")
                 next_cmd = self.cmd_q.get() # cmd should be a tuple
                 function, *args = next_cmd
-                if function in locals():
-                    locals()[function](*args)
-
-            sleep(0.1) # slight delay to save resources
+                #print("Servos found ", function, " with args ", args, " in queue")
+                if function.strip() in globals():
+                    globals()[function](*args)
+                else:
+                    if function.strip() == 'move_forward':
+                        self.move_forward(args[0])
+                    elif function.strip() == 'move_backward':
+                        self.move_backward(args[0])
+                    elif function.strip() == 'pivot_turn_left':
+                        self.pivot_turn_left(args[0])
+                    elif function.strip() == 'pivot_turn_right':
+                        self.pivot_turn_right(args[0])
+                    elif function.strip() == 'neutral':
+                        self.neutral()
+                    elif function.strip() == 'halt':
+                        self.halt()
