@@ -4,9 +4,10 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 import subprocess
-import Detect_trash_on_images as mrcnn
+import TrashDetector as Trash
 from PIL import Image
 from PIL import ImageTk
+import os
 
 
 #--------------------------------------------------------------------------
@@ -46,6 +47,11 @@ for i in range(len(arpstring)):
         rtmpip = arpstring[i-1]
 
 
+td = Trash.TrashDetector()
+
+
+
+
 
 
 #--------------------------------------------------------------------------
@@ -54,12 +60,14 @@ for i in range(len(arpstring)):
 
 
 win = tk.Tk()	#initialize a window for the GUI
-
+runDisplayed = False
+ROOT_DIR = os.getcwd()
+print(ROOT_DIR)
 
 # command3 is the terminal command that connects to the RTMP stream and
 # then captures and image from it. See onClick function for more.
 command3 = r'ffmpeg -y -i rtmp://' +rtmpip+ \
-		   r'/live/test -vframes 1 "C:/Users/spenc/Uni Fourth Year/Capstone/Code/robot-drone-collaboration/src/Trash Detector Test/Trash_Detection/images2/img%03d.jpg"'
+		   r'/live/test -vframes 1 "'+ROOT_DIR+'/images2/img%03d.jpg"'
 print(command3)
 
 
@@ -68,25 +76,29 @@ print(command3)
 # The function then opens this picture, resizes it, and adds it to the GUI
 # so that the user can verify it before running the detection. It also adds
 # the button to start detection to the GUI at this time.
-def onClick():
+def onClick(label):
     process = subprocess.Popen(command3, stdout=subprocess.PIPE, stderr=None, shell=True)
     output = process.communicate()
     img = Image.open("images2\img001.jpg")
     img = img.resize((500,281), Image.ANTIALIAS)
     photoImg =  ImageTk.PhotoImage(img)
-    CLabel = tk.Label(win, image=photoImg)
-    CLabel.img = photoImg
-    CLabel.pack()
-    runDetectionText = tk.Label(win, text="Click to perform detection on image")
-    runDetectionText.pack()
-    detectionButton = tk.Button(win, text="Run", fg="green", command=onClick2)
-    detectionButton.pack()
+    #CLabel = tk.Label(win, image=photoImg)
+    label.configure(image=photoImg)
+    label.img = photoImg
+    label.pack()
+    global runDisplayed
+    if not runDisplayed:
+        runDetectionText = tk.Label(win, text="Click to perform detection on image")
+        runDetectionText.pack()
+        detectionButton = tk.Button(win, text="Run", fg="green", command=onClick2)
+        detectionButton.pack()
+        runDisplayed = True
 
 # Function that is run when the "Run" button is clicked. This starts the 
 # trash detection on the picture stored in the directory after the "Capture"
 # button was clicked.
 def onClick2():
-	mrcnn.main()
+	td.run()
     
 
 # The following code initializes the GUI window
@@ -98,8 +110,11 @@ win.resizable(False, False)		#Don't make window resizable in x or y
 tk.Label(win, text="Ensure mobile hotspot is turned on and camera is streaming before starting!",\
 		 background='red').pack() 	#Warning message to user
 
+CLabel = tk.Label(win)
+
 tk.Label(win, text="Click to capture image").pack()		#Button label	
-tk.Button(win, text="Capture", fg="red", command=onClick).pack()	#"Capture" button
+tk.Button(win, text="Capture", fg="red", command= lambda: onClick(CLabel)).pack()	#"Capture" button
+
 
 
 win.mainloop()
