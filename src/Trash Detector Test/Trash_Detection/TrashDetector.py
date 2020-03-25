@@ -113,7 +113,7 @@ class TrashDetector:
             #--------------------------------------------------------------------------
             # STARTING POINT OF ROBOT
             #--------------------------------------------------------------------------
-            currentPoint = [(550,2000)]
+            currentPoint = [(200,250)]
             listOfPoints.append(currentPoint[0])
 
             # Loop through all the detected objects. For each object, store the point determined to
