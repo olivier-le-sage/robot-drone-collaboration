@@ -1,9 +1,11 @@
 import math
 
-# Take list of points with distances as input
+# Take list of points, with distances, as the input
 
 List LineVectors
+
 List Points
+
 List Angles
 
 #Constants
@@ -17,19 +19,48 @@ MOVE_DISTANCE = 10
 class MoveRobot:
 
 
-    def __init__(self, LineVectors, Angles):
+    def __init__(self, Points, LineVectors, Angles):
 
         self.LineVectors = LineVectors
         self.Angles = Angles
+        self.Points = Points
 
-    def Find_Angles (Angles)
+
+    def Generate_Vectors()
+
+        #Generate vectors between all points
+        for i in range(len(Points)-1):
+
+            LineVectors[i] = LineVector.Generate_Vector(Points[i], Points[i+1])
+
+        #Generate vector between final point and origin point
+        LineVectors[-1] = LineVector.Generate_Vector(Points[-1], Points[0])
+        return
+
+    def Find_Angles()
 
         #Loop through list of points and find the angle between each connecting line
         for i in range(len(Angles)-1):
 
-            AngleCalculator.angle_between(LineVectors[i], LineVectors[i+1])
+            Angles[i] = AngleCalculator.angle_between(LineVectors[i][1], LineVectors[i+1][1])
 
-    def Move_Along_Line (?)
+        return
 
+    #Moves robot along a single line vector
+    def Move_Robot_Line (LineVector)
 
-    def Turn_Robot ()
+        Num_Moves = math.floor(LineVector.Calculate_Length / MOVE_DISTANCE)
+
+        for i in range(Num_Moves):
+
+            #Make call to servo
+        return
+
+    def Turn_Robot (Angle, Point1, Point2)
+
+        #Need to check point positions to determine turn direction
+
+        Num_Turns = math.floor(Angle / TURN_ANGLE)
+
+        for i in range(Num_Turns):
+            #Make call to servo
