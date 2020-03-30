@@ -32,9 +32,13 @@ from mrcnn.visualize import display_images
 import mrcnn.model as modellib
 from mrcnn.model import log
 from trash import trash
+from Path import get_distances
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 # Root directory of the project.
 # Change in case you want to put the code somewhere else.
+
 ROOT_DIR = os.getcwd()
 
 # Path to Trash trained weights
@@ -126,6 +130,35 @@ class TrashDetector:
 
             return cv2.resize(image, dim, interpolation=inter)
 
+
+        def find_post_it(list_of_contours, robot_contour):
+            '''
+                    Finds the post-it note on the robot by locating all contours that have an
+                    area within 4.5%-5.5% of the robots area (the post it should be right around 5%).
+
+                    Assumes the robot is present in the picture.
+
+                    Returns the post-it contour.
+            '''
+
+            # TODO: add a second verification that checks to make sure the contours that pass the size test are located
+            #  within the robot's area
+            post_it_list = []
+            i = 0
+
+            for contour in list_of_contours:
+                robot_area = cv2.contourArea(robot_contour)
+                min_area = robot_area * 0.045
+                max_area = robot_area * 0.055
+                area = cv2.contourArea(contour)
+                if min_area < area < max_area:
+                    post_it_list.append(contour)
+                i += 1
+
+
+            post_it = max(post_it_list, key = cv2.contourArea)
+            return post_it #check to make sure this is returning the right thing
+
         x,y,angle,width,height = 0,0,0,0,0
 
         # load the image, convert it to grayscale, and blur it slightly
@@ -138,20 +171,22 @@ class TrashDetector:
         edged = cv2.dilate(edged, None, iterations=1)
         edged = cv2.erode(edged, None, iterations=1)
         # find contours in the edge map
-        cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
+        cnts, contour_hierarchy = cv2.findContours(edged.copy(), cv2.RETR_CCOMP,
             cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
+        #cnts = imutils.grab_contours(cnts)
         # sort the contours from left-to-right and initialize the
         # 'pixels per metric' calibration variable
-        (cnts, _) = contours.sort_contours(cnts)
+        (cntrs, _) = contours.sort_contours(cnts)
+
 
         ## Next we take the largest contour
         # For now we'll just take the biggest cluster to be the robot.
         # In the future better ways of identifying the robot in the picture
         # will be required.
-        cnts = list(cnts)
-        cnts.sort(key=cv2.contourArea) # sort contours by smallest area first
-        c = cnts.pop() # take the largest
+        cntrs = list(cntrs)
+        c = max(cntrs, key = cv2.contourArea)
+
+
 
         # compute the rotated bounding box of the contour
         orig = image.copy()
@@ -163,48 +198,102 @@ class TrashDetector:
         # order, then draw the outline of the rotated bounding
         # box
         box = perspective.order_points(box)
+        print(box)
         cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
         # loop over the original points and draw them
         for (x, y) in box:
             cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
 
-        # unpack the ordered bounding box, then compute the midpoint
-        # between the top-left and top-right coordinates, followed by
-        # the midpoint between bottom-left and bottom-right coordinates
+        # unpack the ordered bounding box
         (tl, tr, br, bl) = box
+
+        # find the post-it box and then repeat same steps
+        # TODO: add some error handling to both this and the part that calls it. For now it just exits if it can't find
+        #  the post-it.
+        try:
+            c2 = find_post_it(cnts, c)
+        except ValueError:
+            print("Unable to find post-it")
+            exit()
+
+        box2 = cv2.minAreaRect(c2)
+        box2 = cv2.cv.BoxPoints(box2) if imutils.is_cv2() else cv2.boxPoints(box2)
+        box2 = np.array(box2, dtype="int")
+        print(box2)
+        cv2.drawContours(orig, [box2.astype("int")], -1, (0, 255, 0), 2)
+        # loop over the original points and draw them
+        for (x, y) in box2:
+            cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
+
+        # unpack the post-it box
+        (tl2, tr2, br2, bl2) = box2
+
+        # compute the midpoint between the top-left and top-right coordinates,
+        # followed by the midpoint between bottom-left and bottom-right
+        # coordinates
         (tltrX, tltrY) = midpoint(tl, tr)
         (blbrX, blbrY) = midpoint(bl, br)
-        # compute the midpoint between the top-left and top-right points,
-        # followed by the midpoint between the top-righ and bottom-right
+        (tltrX2, tltrY2) = midpoint(tl2, tr2)
+        (blbrX2, blbrY2) = midpoint(bl2, br2)
+
         (tlblX, tlblY) = midpoint(tl, bl)
         (trbrX, trbrY) = midpoint(tr, br)
+        (tlblX2, tlblY2) = midpoint(tl2, bl2)
+        (trbrX2, trbrY2) = midpoint(tr2, br2)
+
         # draw the midpoints on the image
         cv2.circle(orig, (int(tltrX), int(tltrY)), 5, (255, 0, 0), -1)
         cv2.circle(orig, (int(blbrX), int(blbrY)), 5, (255, 0, 0), -1)
         cv2.circle(orig, (int(tlblX), int(tlblY)), 5, (255, 0, 0), -1)
         cv2.circle(orig, (int(trbrX), int(trbrY)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(tltrX2), int(tltrY2)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(blbrX2), int(blbrY2)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(tlblX2), int(tlblY2)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(trbrX2), int(trbrY2)), 5, (255, 0, 0), -1)
         # draw lines between the midpoints
         cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
         (255, 0, 255), 2)
         cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
         (255, 0, 255), 2)
+
+        cv2.line(orig, (int(tltrX2), int(tltrY2)), (int(blbrX2), int(blbrY2)),
+                 (255, 0, 255), 2)
+        cv2.line(orig, (int(tlblX2), int(tlblY2)), (int(trbrX2), int(trbrY2)),
+                 (255, 0, 255), 2)
         # compute the Euclidean distance between the midpoints
         height = distance.euclidean((tltrX, tltrY), (blbrX, blbrY))
         width  = distance.euclidean((tlblX, tlblY), (trbrX, trbrY))
+        height2 = distance.euclidean((tltrX2, tltrY2), (blbrX2, blbrY2))
+        width2 = distance.euclidean((tlblX2, tlblY2), (trbrX2, trbrY2))
         # compute the center by computing the midpoints' midpoints
         # use both ways then compute the average to smooth out error
-        center_1 = midpoint( (tlblX, tlblY), (trbrX, trbrY) )
-        center_2 = midpoint( (tltrX, tltrY), (blbrX, blbrY) )
-        x = (center_1[0] + center_2[0])/2
-        y = (center_1[1] + center_2[1])/2
+        robot_center_1 = midpoint( (tlblX, tlblY), (trbrX, trbrY) )
+        robot_center_2 = midpoint( (tltrX, tltrY), (blbrX, blbrY) )
+        rx = (robot_center_1[0] + robot_center_2[0])/2
+        ry = (robot_center_1[1] + robot_center_2[1])/2
+
+        postit_center_1 = midpoint((tlblX2, tlblY2), (trbrX2, trbrY2))
+        postit_center_2 = midpoint((tltrX2, tltrY2), (blbrX2, blbrY2))
+        px = (postit_center_1[0] + postit_center_2[0]) / 2
+        py = (postit_center_1[1] + postit_center_2[1]) / 2
         # draw the center on the image
-        cv2.circle(orig, (int(x), int(y)), 10, (0, 255, 255), -1)
+        cv2.circle(orig, (int(rx), int(ry)), 10, (0, 255, 255), -1)
+        cv2.circle(orig, (int(px), int(py)), 10, (0, 255, 255), -1)
+
+        # TODO: Figure out which lines are front/back vs sides of robot. Use the average of their lengths,
+        #  shorter ones are front/back. Find the angle of the sides with respect to y axis (?). Create a vector
+        #  starting at the robots midpoint and ending at the post-its midpoint. This vector points toward the back of
+        #  the robot, so the front should be the opposite direction.
+
         # compute the angle/orientation of the box in radians
         # use both sides separately then take the average (to smooth out error)
         angle_rad_1 = math.atan( (tl[0]-bl[0]) / (tl[1]-bl[1]) )
         angle_rad_2 = math.atan( (tr[0]-br[0]) / (tr[1]-br[1]) )
         angle_rad = (angle_rad_1 + angle_rad_2)/2
+        print(angle_rad)
         angle = angle_rad * (180/math.pi)
+        print(rx, ry)
+        print(angle)
 
         # draw the object sizes on the image
         cv2.putText(orig, "{:.1f}px".format(height),
@@ -214,7 +303,7 @@ class TrashDetector:
             (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
             0.65, (255, 255, 255), 2)
         # show the output image
-        resized = resize_with_ratio(orig, height=960)
+        resized = resize_with_ratio(orig, height=720)
         cv2.imshow("Image", resized)
         cv2.waitKey(0)
 
@@ -240,7 +329,7 @@ class TrashDetector:
         #ax.imshow(image_felz_colored)
         #ax.axis('off')
 
-        return x, y, angle, width, height
+        return rx, ry, angle, width, height
 
     def run(self):
         # RUN COLLECTION
@@ -255,6 +344,7 @@ class TrashDetector:
 
 
             listOfPoints = [] 	#	list of points that will make up the path
+            listOfDistances = []
 
             def f(x,y):
                     return (x+y)*np.exp(-5.0*(x**2+y**2))
@@ -273,7 +363,7 @@ class TrashDetector:
             #--------------------------------------------------------------------------
             rbt_x,rbt_y,rbt_angle,rbt_width,rbt_height = self.get_init_pose(image_temp)
             print("Robot found at: (",rbt_x,"px,",rbt_y,"px,",rbt_angle,"deg)")
-            currentPoint = [(rbt_x, rbt_y)]
+            currentPoint = [(rbt_y, rbt_x)]
             listOfPoints.append(currentPoint[0])
 
             # Loop through all the detected objects. For each object, store the point determined to
@@ -302,9 +392,12 @@ class TrashDetector:
                 mask = np.delete(mask,absoluteShortest[2], 2)
                 currentPoint = [(absoluteShortest[0][0],absoluteShortest[0][1])]
                 listOfPoints.append(currentPoint[0])
+                listOfDistances.append(absoluteShortest[1])
 
             # Display final results
             print(listOfPoints)
+            distanceCM = get_distances(rbt_height, listOfDistances)
+            print("Distance between points is" + str(distanceCM))
             image = image_temp
             temp = skimage.io.imread('{}'.format(image))
             plt.figure(figsize=(8,8))
@@ -313,6 +406,8 @@ class TrashDetector:
             plt.scatter(y, x)
             plt.plot(y,x,linewidth=3)
             plt.show()
+
+        #return listOfPoints, listOfDistances
 
 if __name__ == '__main__':
     trash_detector = TrashDetector()
