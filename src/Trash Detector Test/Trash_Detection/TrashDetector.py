@@ -173,11 +173,10 @@ class TrashDetector:
         # find contours in the edge map
         cnts, contour_hierarchy = cv2.findContours(edged.copy(), cv2.RETR_CCOMP,
             cv2.CHAIN_APPROX_SIMPLE)
-        #cnts = imutils.grab_contours(cnts)
+        # cnts = imutils.grab_contours(cnts)
         # sort the contours from left-to-right and initialize the
         # 'pixels per metric' calibration variable
         (cntrs, _) = contours.sort_contours(cnts)
-
 
         ## Next we take the largest contour
         # For now we'll just take the biggest cluster to be the robot.
@@ -185,8 +184,6 @@ class TrashDetector:
         # will be required.
         cntrs = list(cntrs)
         c = max(cntrs, key = cv2.contourArea)
-
-
 
         # compute the rotated bounding box of the contour
         orig = image.copy()
@@ -198,7 +195,6 @@ class TrashDetector:
         # order, then draw the outline of the rotated bounding
         # box
         box = perspective.order_points(box)
-        print(box)
         cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
         # loop over the original points and draw them
         for (x, y) in box:
@@ -219,7 +215,6 @@ class TrashDetector:
         box2 = cv2.minAreaRect(c2)
         box2 = cv2.cv.BoxPoints(box2) if imutils.is_cv2() else cv2.boxPoints(box2)
         box2 = np.array(box2, dtype="int")
-        print(box2)
         cv2.drawContours(orig, [box2.astype("int")], -1, (0, 255, 0), 2)
         # loop over the original points and draw them
         for (x, y) in box2:
@@ -284,15 +279,53 @@ class TrashDetector:
         #  shorter ones are front/back. Find the angle of the sides with respect to y axis (?). Create a vector
         #  starting at the robots midpoint and ending at the post-its midpoint. This vector points toward the back of
         #  the robot, so the front should be the opposite direction.
+        # set post-it as 0,0 then calculate the robot center as a point around it
+        rx_rel = rx - px
+        ry_rel = ry - py
+        # calculate the angle between the post it and the robot
+        angle_robot_postit_rad = math.atan2(ry_rel, rx_rel)
+        angle_robot_postit = angle_robot_postit_rad * (180 / math.pi) * -1
+
+        cv2.circle(orig, (int(tl[0]), int(tl[1])), 10, (255, 0, 0), -1)
+        cv2.circle(orig, (int(tr[0]), int(tr[1])), 10, (0, 255, 0), -1)
+        cv2.circle(orig, (int(bl[0]), int(bl[1])), 10, (0, 0, 255), -1)
+        cv2.circle(orig, (int(br[0]), int(br[1])), 10, (255, 255, 255), -1)
+
+
+
+        # distinguish the side from the front
+        left = distance.euclidean((tl[0], tl[1]), (bl[0], bl[1]))
+        right = distance.euclidean((tr[0], tr[1]), (br[0], br[1]))
+        top = distance.euclidean((tl[0], tl[1]), (tr[0], tr[1]))
+        bottom = distance.euclidean((br[0], br[1]), (bl[0], bl[1]))
+        average1 = (left+right)/2
+        average2 = (bottom+top)/2
+
+
+
+        if average1 > average2:
+            side1p1 = bl
+            side1p2 = tl
+            side2p1 = br
+            side2p2 = tr
+        else:
+            side1p1 = tl
+            side1p2 = tr
+            side2p1 = bl
+            side2p2 = br
+
 
         # compute the angle/orientation of the box in radians
         # use both sides separately then take the average (to smooth out error)
-        angle_rad_1 = math.atan( (tl[0]-bl[0]) / (tl[1]-bl[1]) )
-        angle_rad_2 = math.atan( (tr[0]-br[0]) / (tr[1]-br[1]) )
+        angle_rad_1 = math.atan2( (side1p2[1]-side1p1[1]), (side1p2[0]-side1p1[0]))
+        angle_rad_2 = math.atan2((side2p2[1]-side2p1[1]), (side2p2[0]-side2p1[0]))
         angle_rad = (angle_rad_1 + angle_rad_2)/2
-        print(angle_rad)
-        angle = angle_rad * (180/math.pi)
-        print(rx, ry)
+        angle = angle_rad * (180/math.pi) * -1
+        # catch any cases where the top left wasn't the corner we expected
+        if angle_robot_postit < 0 and angle > 0:
+            angle = -180 + angle
+        if angle_robot_postit > 0 and angle < 0:
+            angle = 180 + angle
         print(angle)
 
         # draw the object sizes on the image
