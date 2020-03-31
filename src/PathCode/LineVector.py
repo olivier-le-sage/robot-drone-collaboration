@@ -4,13 +4,13 @@ import math
 
 #Assume points are given as tuples with x, y
 
-class LineVector
+class LineVector:
 
     #LineVector is represented as a tuple of size 2
     #Origin point in first element, direction line in second element
 
 
-    def __init__(self, Point1, Point2):
+    def __init__(self, Point1, Point2): 
             self.Point1 = Point1
             self.Point2 = Point2
 
@@ -26,9 +26,30 @@ class LineVector
             Line_Vector = (Point1, (x2 - x1, y2-y1))
             return Line_Vector
 
+ 
 
+'''
     def Calculate_Length ()
 
         Length = math.srqt ((y2 - y1)^2 (x2-x1)^2)
 
         return Length
+        '''
+    # tried to run the one above but it gives me error also not sure if we need the def __init__(self, Point1, Point2): 
+    
+
+def Calculate_Length (Point1,Point2):
+        x1 = Point1[0]
+        y1 = Point1[1]
+
+        x2 = Point2[0]
+        y2 = Point2[1]
+
+        Length = math.sqrt((y2 - y1)^2 + (x2-x1)^2)
+        print(Length)
+
+        return Length
+
+
+#Calculate_Length((3,5), (2,10))
+#2.449489742783178
