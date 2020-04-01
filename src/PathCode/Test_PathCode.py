@@ -9,6 +9,8 @@ List_Points = [(3,5), (4,6), (10,8)]
 
 List_Angles= [30.0, 45.6, -135.0]
 
+Original_Point = (30,35) #robot point
+
 #Constants
 
 TURN_ANGLE = 10
@@ -33,6 +35,28 @@ def angle_between(v1, v2):
 
 #Test
 #angle_between((1, 0, 0), (0, 1, 0))
+
+def Generate_Vector(original):
+
+    for i in range(len(List_Points)-1):
+        #p2= np.array(List_Points[i+1])
+
+        p2= List_Points[i]
+       
+        f0= (p2[0]- original[0])
+       
+        f1= (p2[1]- original[1])
+
+        #Save the vector in tuple format: (Origin, (Line Vector))
+        line_vector = (original, (f0,f1))
+        #print("Line Vector")
+       
+        #print(line_vector)
+        return line_vector
+      
+#Test
+#Generate_Vector(Original_Point)
+
 
 def Calculate_Length (Point1,Point2):
     x1 = Point1[0]
@@ -60,8 +84,16 @@ def Find_Angles():
 #Test
 #Find_Angles()
 
-#def Move_Robot_Line (LineVector):
+
+LineVector = Generate_Vector(Original_Point)
+
+def Move_Robot_Line (LineVector):
+    Num_Moves = math.floor(Calculate_Length(LineVector[0],LineVector[1] ) / MOVE_DISTANCE)
+    print("Num of Moves")
+    print(Num_Moves)
     
+#Test
+#Move_Robot_Line (LineVector)
   
 def Turn_Robot (Angle, Point1, Point2):
     
