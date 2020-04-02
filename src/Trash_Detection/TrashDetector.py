@@ -24,7 +24,7 @@ import tensorflow as tf
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from scipy.spatial import distance
+from scipy.spatial import distance as scp_dist
 from scipy import ndimage as ndi
 from .mrcnn import utils
 from .mrcnn import visualize
@@ -43,8 +43,8 @@ from shapely.geometry.polygon import Polygon
 ROOT_DIR = os.getcwd()
 # print("[DEBUG] Current cwd is:", ROOT_DIR)
 
-# Path to Trash trained weights
-TRASH_WEIGHTS_PATH = "weights/mask_rcnn_trash_0200_030519_large.h5" # the best
+# Path to Trash trained weights (from project root)
+TRASH_WEIGHTS_PATH = "src/Trash_Detector_Test/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5" # the best
 
 # Device to load the neural network on.
 # Useful if you're training a model on the same
@@ -261,10 +261,10 @@ class TrashDetector:
         cv2.line(orig, (int(tlblX2), int(tlblY2)), (int(trbrX2), int(trbrY2)),
                  (255, 0, 255), 2)
         # compute the Euclidean distance between the midpoints
-        height = distance.euclidean((tltrX, tltrY), (blbrX, blbrY))
-        width  = distance.euclidean((tlblX, tlblY), (trbrX, trbrY))
-        height2 = distance.euclidean((tltrX2, tltrY2), (blbrX2, blbrY2))
-        width2 = distance.euclidean((tlblX2, tlblY2), (trbrX2, trbrY2))
+        height = scp_dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
+        width  = scp_dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
+        height2 = scp_dist.euclidean((tltrX2, tltrY2), (blbrX2, blbrY2))
+        width2 = scp_dist.euclidean((tlblX2, tlblY2), (trbrX2, trbrY2))
         # compute the center by computing the midpoints' midpoints
         # use both ways then compute the average to smooth out error
         robot_center_1 = midpoint( (tlblX, tlblY), (trbrX, trbrY) )
@@ -299,10 +299,10 @@ class TrashDetector:
 
 
         # distinguish the side from the front
-        left = distance.euclidean((tl[0], tl[1]), (bl[0], bl[1]))
-        right = distance.euclidean((tr[0], tr[1]), (br[0], br[1]))
-        top = distance.euclidean((tl[0], tl[1]), (tr[0], tr[1]))
-        bottom = distance.euclidean((br[0], br[1]), (bl[0], bl[1]))
+        left = scp_dist.euclidean((tl[0], tl[1]), (bl[0], bl[1]))
+        right = scp_dist.euclidean((tr[0], tr[1]), (br[0], br[1]))
+        top = scp_dist.euclidean((tl[0], tl[1]), (tr[0], tr[1]))
+        bottom = scp_dist.euclidean((br[0], br[1]), (bl[0], bl[1]))
         average1 = (left+right)/2
         average2 = (bottom+top)/2
 
@@ -409,8 +409,8 @@ class TrashDetector:
 
             for i in range(mask.shape[2]):
                 diffMaskNewArray = np.transpose(np.nonzero(mask[:,:,i] == 1)) # Changes the array so that we have an array of points were the mask is.
-                shortestPoint = diffMaskNewArray[distance.cdist(currentPoint, diffMaskNewArray, 'euclidean').argmin()] # Finds the closest point in the mask to a given point and stores that point.
-                distanceToPoint = distance.cdist(currentPoint, [shortestPoint], 'euclidean') # Stores the distance of that point. Currently stores it in a 2D array. Need to find a fix for this later
+                shortestPoint = diffMaskNewArray[scp_dist.cdist(currentPoint, diffMaskNewArray, 'euclidean').argmin()] # Finds the closest point in the mask to a given point and stores that point.
+                distanceToPoint = scp_dist.cdist(currentPoint, [shortestPoint], 'euclidean') # Stores the distance of that point. Currently stores it in a 2D array. Need to find a fix for this later
                 distanceToPoint = distanceToPoint[0][0] #The value is currently written in a 2D array, this takes the value from that 2D array and stores it.
                 listOfShortest.append([shortestPoint,distanceToPoint,i]) # Add the point to a list of shortest. This can be changed later to just replace the stored value if the new one is closer.
                 image = image_temp
@@ -464,9 +464,8 @@ class TrashDetector:
         image_results = []
 
         for image in self.jpg:
-            point_list, dist_list = self.run_single(image, quiet_mode)
-            image_results.append([image, ])
-
+            point_list,init_pose,robot_size = self.run_single(image,quiet_mode)
+            image_results += [(image, point_list, init_pose, robot_size)]
 
         return image_results
 

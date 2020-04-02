@@ -13,7 +13,7 @@
 # The outputs from these algorithms are then communicated to the robot via MQTT.
 
 import sys
-import bluetooth as bt
+import bluetooth as bt # pybluez
 import datetime as dt
 from threading import Thread
 from queue import Queue
@@ -89,7 +89,7 @@ mqtt_interface.start() # run mqtt_interface as a thread
 
 # 2. Process images and generate path + initial location/pose of the robot
 print("Procssing images... please wait.")
-point_list, pose, size = td.run(quiet_mode=False)
+point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=False)
 print("Trash detection complete.")
 
 # 3. Convert path to instructions

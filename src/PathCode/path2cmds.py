@@ -4,7 +4,7 @@
 import math
 
 # Constants
-MIN_TURN_ANGLE = 10 # degrees
+MIN_TURN_ANGLE = 10 * (math.pi/180) # 10 degrees in radians
 MIN_MOVE_DISTANCE = 10 # cm
 ROBOT_DIM_W = 33.5 # cm
 ROBOT_DIM_H = 37.0 # cm
@@ -46,7 +46,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
 
         def get_mag(self):
             ''' returns magnitude of the vector '''
-            return math.sqrt((self.y)^2 + (self.x)^2)
+            return math.sqrt((self.y)**2 + (self.x)**2)
 
         def get_unit_vector(self):
             ''' returns a new vector object with normalized lengths '''
@@ -62,7 +62,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
                 returns the angle between this vector object and another.
                 always gives the small angle, in radians.
             '''
-            return math.arccos(self.dot(self, other)/(self.get_mag()*other.get_mag()))
+            return math.acos(self.dot(other)/(self.get_mag()*other.get_mag()))
 
     # private helper function
     def calc_num_moves(vector):
@@ -88,7 +88,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
             # no need to turn
             direction = 1
 
-        num_turns = int(math.floor(angle/MIN_TURN_ANGLE))
+        num_turns = int(round(angle/MIN_TURN_ANGLE))
         return direction * num_turns
     # private helper function
     def pix2cm(vector_px, robot_size):
@@ -157,7 +157,12 @@ def gen_commands_from_path(path, init_pose, robot_size):
         turns.append(calc_num_turns(theta, v1, v2))
     for v in vectors:
         moves.append(calc_num_moves(v))
-    turns.append(0) # add an extra turn so the lists have the same length
+    # we need to add an extra turn at the beginning to correct robot orientation
+    # first we take the robot pose and generate a vector to represent it
+    rbt_angle_rad = init_pose[2] * (math.pi/180)
+    rbt_dir_v = LineVector(math.cos(init_pose[0]), math.sin(init_pose[1]),
+                           (init_pose[0], init_pose[1]) )
+    turns.insert(0, calc_num_turns(rbt_angle_rad, rbt_dir_v, vectors[0]))
 
     # 4. Generate list with commands and return it
     # In general the commands go: 1) turn, 2) move forward, 3) stop, then repeat
@@ -175,4 +180,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
         # pause to allow picking up of garbage
         list_cmds += ['halt']
 
+    print("[DEBUG] Vectors from path: ", [str(v) for v in vectors])
+    print("[DEBUG] # turns from path: ", turns)
+    print("[DEBUG] # moves from path: ", moves)
     return list_cmds

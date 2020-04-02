@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 """
 Mask R-CNN
@@ -30,8 +30,8 @@ ROOT_DIR = os.path.abspath("../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+from ..mrcnn.config import Config
+from ..mrcnn import model as modellib, utils
 
 # Path to trained weights file
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
@@ -63,7 +63,7 @@ class TrashConfig(Config):
     NUM_CLASSES = 1 + 1  # Background + trash
 
     # Number of training steps per epoch
-    # We have tried 5, now let's up the game to 10 
+    # We have tried 5, now let's up the game to 10
     STEPS_PER_EPOCH = 17
 
     # Skip detections with < 90% confidence
@@ -84,13 +84,13 @@ class TrashDataset(utils.Dataset):
             # Train or validation dataset?
             assert subset in ["train", "val"]
             dataset_dir = os.path.join(dataset_dir, subset)
- 
+
             import glob
             all_jsons = glob.glob("{}/*.json".format(dataset_dir))
             for json_file in all_jsons:
                 print(json_file)
                 #annotations = json.load(open(os.path.join(dataset_dir, "annotation_project_trash_test.json")))
-                annotations = json.load(open(json_file)) 
+                annotations = json.load(open(json_file))
 
                 annotations = list(annotations.values()) # don't need the dict keys
                 for a in annotations:
@@ -114,13 +114,13 @@ class TrashDataset(utils.Dataset):
                             image = skimage.io.imread(image_path)
                             height, width = image.shape[:2]
                             print(height, width)
-    
+
                             self.add_image("trash", image_id=image_file.get('filename'),  # use file name as a unique image id
                                     path=image_path,
                                     width=width, height=height,
                                     polygons=polygons)
-                        except Exception as e: #sellest, et kõiki pilte ei ole train kaustas.. 
-                            print(e)   
+                        except Exception as e: #sellest, et kõiki pilte ei ole train kaustas..
+                            print(e)
                         #print('')
 
     def load_mask(self, image_id):
