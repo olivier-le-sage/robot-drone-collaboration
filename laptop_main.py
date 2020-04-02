@@ -97,9 +97,19 @@ commands = gen_commands_from_path(point_list, pose, size)
 
 # 4. Send instructions to robot via MQTT payloads
 print("[DEBUG] Commands generated from path: \n", commands)
+for cmd in commands:
+    robot_cmd = message_defs_pb2.MoveCommand()
+    robot_cmd.name = cmd
+    if (cmd == 'move_forward') or (cmd == 'move_backward'):
+        robot_cmd.arg1 = 1 # let's say 1 sec = 10 cm
+    elif (cmd == 'pivot_turn_left') or (cmd == 'pivot_turn_right'):
+        robot_cmd.arg1 = 1 # let's say 1 sec = 10 degrees
+    else:
+        robot_cmd.arg1 = None
+    mqtt_interface.publish('olivier-le-sage/land-robot/move',
+                            robot_cmd.SerializeToString())
 
 ##### Interactive demo given in February 2020 #####
-
 def run_interactive_demo():
     # For now we'll keep it simple -- a while loop where the user decides which
     #     command to send to the robot
