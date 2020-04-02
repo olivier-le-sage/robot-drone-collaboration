@@ -40,6 +40,7 @@ from shapely.geometry.polygon import Polygon
 # Change in case you want to put the code somewhere else.
 
 ROOT_DIR = os.getcwd()
+print("[DEBUG] Current cwd is:", ROOT_DIR)
 
 # Path to Trash trained weights
 TRASH_WEIGHTS_PATH = "weights/mask_rcnn_trash_0200_030519_large.h5" #the best
@@ -56,7 +57,8 @@ DEVICE = "/cpu:0"  # /cpu:0 or /gpu:0
 TEST_MODE = "inference"
 
 class TrashDetector:
-    def __init__(self):
+    
+    def __init__(self, images_dir="images2"):
 
         print(ROOT_DIR)
         # Import Mask RCNN
@@ -72,9 +74,10 @@ class TrashDetector:
         # Get images from the directory of all the test images
         # TODO: This should be changed to the directory where the desired images are stored
 
-        self.jpg = glob.glob("images2/*.jpg")
-        self.jpeg = glob.glob("images2/*.jpeg")
+        self.jpg = glob.glob(images_dir+"/*.jpg")
+        self.jpeg = glob.glob(images_dir+"*.jpeg")
         self.jpg.extend(self.jpeg)
+        print("[DEBUG] List of images found: ", self.jpg)
 
         # Override the training configurations with a few
         # changes for inferencing.
@@ -98,7 +101,7 @@ class TrashDetector:
         weights_path = os.path.join(ROOT_DIR, TRASH_WEIGHTS_PATH)
         self.model.load_weights(weights_path, by_name=True)
 
-    def get_init_pose(self, image):
+    def get_init_pose(self, image, quiet_mode=False):
         '''
             Determines the initial position and size of the robot from the same
             picture as the path calculation (using openCV edge detection).
@@ -112,9 +115,11 @@ class TrashDetector:
         def midpoint(a, b):
             # returns (a_x+b_x)/2 and (a_y+b_y)/2
 	        return ((a[0] + b[0]) * 0.5, (a[1] + b[1]) * 0.5)
+
         def calculate_pose(x, y):
             # Calculate euclidean pose from rectangle size (in pixels)
             return (x, y, angle)
+
         def resize_with_ratio(image,width=None,height=None,inter=cv2.INTER_AREA):
             dim = None
             (h, w) = image.shape[:2]
@@ -129,7 +134,6 @@ class TrashDetector:
                 dim = (width, int(h * r))
 
             return cv2.resize(image, dim, interpolation=inter)
-
 
         def find_post_it(list_of_contours, robot_contour):
             '''
@@ -301,8 +305,6 @@ class TrashDetector:
         average1 = (left+right)/2
         average2 = (bottom+top)/2
 
-
-
         if average1 > average2:
             side1p1 = bl
             side1p2 = tl
@@ -313,7 +315,6 @@ class TrashDetector:
             side1p2 = tr
             side2p1 = bl
             side2p2 = br
-
 
         # compute the angle/orientation of the box in radians
         # use both sides separately then take the average (to smooth out error)
@@ -336,9 +337,11 @@ class TrashDetector:
             (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
             0.65, (255, 255, 255), 2)
         # show the output image
-        resized = resize_with_ratio(orig, height=720)
-        cv2.imshow("Image", resized)
-        cv2.waitKey(0)
+
+        if not quiet_mode:
+            resized = resize_with_ratio(orig, height=720)
+            cv2.imshow("Image", resized)
+            cv2.waitKey(0)
 
         #edges = canny(rgb2gray(image), sigma=1)
         #fill_clusters = ndi.binary_fill_holes(edges)
@@ -364,70 +367,70 @@ class TrashDetector:
 
         return rx, ry, angle, width, height
 
-    def run(self):
-        # RUN COLLECTION
-		# This runs the detection on all images in the directory.
+    def run_single(self, image, quiet_mode=False):
+        '''
+            This runs the detection on a single image.
+        '''
 
-        for image in self.jpg:
-
-            # Save a temporary variable for image so that we can reread it after and then
-            # import the image with imread.
-            image_temp = image
-            image = skimage.io.imread('{}'.format(image))
+        # Save a temporary variable for image so that we can reread it after and then
+        # import the image with imread.
+        image_temp = image
+        image = skimage.io.imread('{}'.format(image))
 
 
-            listOfPoints = [] 	#	list of points that will make up the path
-            listOfDistances = []
+        listOfPoints = [] 	#	list of points that will make up the path
+        listOfDistances = []
 
-            def f(x,y):
-                    return (x+y)*np.exp(-5.0*(x**2+y**2))
+        def f(x,y):
+                return (x+y)*np.exp(-5.0*(x**2+y**2))
 
-            # Run object detection
-            results = self.model.detect([image], verbose=1)
+        # Run object detection
+        results = self.model.detect([image], verbose=1)
 
-            # Save results as r
-            r = results[0]
+        # Save results as r
+        r = results[0]
 
-            mask = r['masks']
-            mask = mask.astype(int)
+        mask = r['masks']
+        mask = mask.astype(int)
 
-            #--------------------------------------------------------------------------
-            # STARTING POINT OF ROBOT
-            #--------------------------------------------------------------------------
-            rbt_x,rbt_y,rbt_angle,rbt_width,rbt_height = self.get_init_pose(image_temp)
-            print("Robot found at: (",rbt_x,"px,",rbt_y,"px,",rbt_angle,"deg)")
-            currentPoint = [(rbt_y, rbt_x)]
+        #--------------------------------------------------------------------------
+        # STARTING POINT OF ROBOT
+        #--------------------------------------------------------------------------
+        rbt_x,rbt_y,rbt_angle,rbt_width,rbt_height = self.get_init_pose(image_temp, quiet_mode)
+        print("Robot found at: (",rbt_x,"px,",rbt_y,"px,",rbt_angle,"deg)")
+        currentPoint = [(rbt_y, rbt_x)]
+        listOfPoints.append(currentPoint[0])
+
+        # Loop through all the detected objects. For each object, store the point determined to
+        # be closest to currentPoint
+        while(mask.shape[2] != 0):
+            listOfShortest = []
+
+            for i in range(mask.shape[2]):
+                diffMaskNewArray = np.transpose(np.nonzero(mask[:,:,i] == 1)) # Changes the array so that we have an array of points were the mask is.
+                shortestPoint = diffMaskNewArray[distance.cdist(currentPoint, diffMaskNewArray, 'euclidean').argmin()] # Finds the closest point in the mask to a given point and stores that point.
+                distanceToPoint = distance.cdist(currentPoint, [shortestPoint], 'euclidean') # Stores the distance of that point. Currently stores it in a 2D array. Need to find a fix for this later
+                distanceToPoint = distanceToPoint[0][0] #The value is currently written in a 2D array, this takes the value from that 2D array and stores it.
+                listOfShortest.append([shortestPoint,distanceToPoint,i]) # Add the point to a list of shortest. This can be changed later to just replace the stored value if the new one is closer.
+                image = image_temp
+                temp = skimage.io.imread('{}'.format(image))
+
+
+            # Print the list of points for each object, calulcate which object is closest to
+            # currentPoint, add it to the listOfPoints and then set it as the new currentPoint
+
+            currentPoint
+            print(listOfShortest)
+            absoluteShortest = min(listOfShortest, key=lambda x: x[1])
+            print("Shortest point is " + str(absoluteShortest[0]) + " and the distance to it is: " + str(absoluteShortest[1])) ##Print the distance to the shortest point.
+            print(absoluteShortest[2])
+            mask = np.delete(mask,absoluteShortest[2], 2)
+            currentPoint = [(absoluteShortest[0][0],absoluteShortest[0][1])]
             listOfPoints.append(currentPoint[0])
+            listOfDistances.append(absoluteShortest[1])
 
-            # Loop through all the detected objects. For each object, store the point determined to
-            # be closest to currentPoint
-            while(mask.shape[2] != 0):
-                listOfShortest = []
-
-                for i in range(mask.shape[2]):
-                    diffMaskNewArray = np.transpose(np.nonzero(mask[:,:,i] == 1)) # Changes the array so that we have an array of points were the mask is.
-                    shortestPoint = diffMaskNewArray[distance.cdist(currentPoint, diffMaskNewArray, 'euclidean').argmin()] # Finds the closest point in the mask to a given point and stores that point.
-                    distanceToPoint = distance.cdist(currentPoint, [shortestPoint], 'euclidean') # Stores the distance of that point. Currently stores it in a 2D array. Need to find a fix for this later
-                    distanceToPoint = distanceToPoint[0][0] #The value is currently written in a 2D array, this takes the value from that 2D array and stores it.
-                    listOfShortest.append([shortestPoint,distanceToPoint,i]) # Add the point to a list of shortest. This can be changed later to just replace the stored value if the new one is closer.
-                    image = image_temp
-                    temp = skimage.io.imread('{}'.format(image))
-
-
-                # Print the list of points for each object, calulcate which object is closest to
-                # currentPoint, add it to the listOfPoints and then set it as the new currentPoint
-
-                currentPoint
-                print(listOfShortest)
-                absoluteShortest = min(listOfShortest, key=lambda x: x[1])
-                print("Shortest point is " + str(absoluteShortest[0]) + " and the distance to it is: " + str(absoluteShortest[1])) ##Print the distance to the shortest point.
-                print(absoluteShortest[2])
-                mask = np.delete(mask,absoluteShortest[2], 2)
-                currentPoint = [(absoluteShortest[0][0],absoluteShortest[0][1])]
-                listOfPoints.append(currentPoint[0])
-                listOfDistances.append(absoluteShortest[1])
-
-            # Display final results
+        # Display final results
+        if not quiet_mode:
             print(listOfPoints)
             distanceCM = get_distances(rbt_height, listOfDistances)
             print("Distance between points is" + str(distanceCM))
@@ -440,7 +443,22 @@ class TrashDetector:
             plt.plot(y,x,linewidth=3)
             plt.show()
 
-        #return listOfPoints, listOfDistances
+        return listOfPoints, listOfDistances
+
+    def run(self, quiet_mode=False):
+        '''
+            RUN COLLECTION
+            This runs the detection on all images in the directory.
+        '''
+
+        image_results = []
+
+        for image in self.jpg:
+            point_list, dist_list = self.run_single(image, quiet_mode)
+            image_results.append([image, ])
+
+
+        return image_results
 
 if __name__ == '__main__':
     trash_detector = TrashDetector()
