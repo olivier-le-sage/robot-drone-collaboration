@@ -23,7 +23,7 @@ sys.path.insert(0, 'robot-drone-collaboration/src') # import src tree
 sys.path.insert(0, 'robot-drone-collaboration/lib') # import lib tree
 
 import src
-import src.Trash_Detector_Test.Trash_Detection.TrashDetector as trash_detect
+import src.Trash_Detection.TrashDetector as trash_detect
 from src.PathCode.path2cmds import *
 import lib
 # import lib.MQTTSN_Python.MQTTSN
@@ -75,7 +75,8 @@ bt_t = Thread(target=bluetooth_server)
 # print("Bluetooth started.")
 
 # initialize trash detection (and load images)
-images = "src/Trash_Detector_Test/Trash_Detection/images2" # relative to this file
+# TODO: use a function call to get this directory so that it's more stable
+images = "src/Trash_Detection/images2" # relative to this file
 td = trash_detect.TrashDetector(images_dir=images)
 
 # initialize MQTT Client

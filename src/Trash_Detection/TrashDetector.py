@@ -44,7 +44,8 @@ ROOT_DIR = os.getcwd()
 # print("[DEBUG] Current cwd is:", ROOT_DIR)
 
 # Path to Trash trained weights (from project root)
-TRASH_WEIGHTS_PATH = "src/Trash_Detector_Test/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5" # the best
+# TODO: Update path to weights folder if it changes
+TRASH_WEIGHTS_PATH = "src/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5" # the best
 
 # Device to load the neural network on.
 # Useful if you're training a model on the same
