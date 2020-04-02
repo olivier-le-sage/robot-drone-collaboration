@@ -89,7 +89,7 @@ mqtt_interface.start() # run mqtt_interface as a thread
 
 # 2. Process images and generate path + initial location/pose of the robot
 print("Procssing images... please wait.")
-point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=True)
+point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=False)
 print("Trash detection complete.")
 
 # 3. Convert path to instructions

@@ -467,7 +467,6 @@ class TrashDetector:
             point_list,init_pose,robot_size = self.run_single(image,quiet_mode)
             image_results += [(image, point_list, init_pose, robot_size)]
 
-
         return image_results
 
 if __name__ == '__main__':
