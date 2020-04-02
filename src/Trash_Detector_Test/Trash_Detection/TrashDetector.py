@@ -26,12 +26,14 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.spatial import distance
 from scipy import ndimage as ndi
-from mrcnn import utils
-from mrcnn import visualize
-from mrcnn.visualize import display_images
-import mrcnn.model as modellib
-from mrcnn.model import log
-import src.Trash_Detector_Test.Trash_Detection.trash.trash as trash
+from .mrcnn import utils
+from .mrcnn import visualize
+from .mrcnn.visualize import display_images
+from .mrcnn.model import log
+from .mrcnn import config
+from .mrcnn import *
+from .mrcnn import model as modellib
+from .trash import trash
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
@@ -42,7 +44,7 @@ ROOT_DIR = os.getcwd()
 # print("[DEBUG] Current cwd is:", ROOT_DIR)
 
 # Path to Trash trained weights
-TRASH_WEIGHTS_PATH = "weights/mask_rcnn_trash_0200_030519_large.h5" #the best
+TRASH_WEIGHTS_PATH = "weights/mask_rcnn_trash_0200_030519_large.h5" # the best
 
 # Device to load the neural network on.
 # Useful if you're training a model on the same
