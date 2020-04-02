@@ -46,7 +46,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
 
         def get_mag(self):
             ''' returns magnitude of the vector '''
-            return math.sqrt((self.y)^2 + (self.x)^2)
+            return math.sqrt((self.y)**2 + (self.x)**2)
 
         def get_unit_vector(self):
             ''' returns a new vector object with normalized lengths '''
@@ -62,7 +62,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
                 returns the angle between this vector object and another.
                 always gives the small angle, in radians.
             '''
-            return math.arccos(self.dot(self, other)/(self.get_mag()*other.get_mag()))
+            return math.acos(self.dot(other)/(self.get_mag()*other.get_mag()))
 
     # private helper function
     def calc_num_moves(vector):
@@ -175,4 +175,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
         # pause to allow picking up of garbage
         list_cmds += ['halt']
 
+    print("[DEBUG] Vectors from path: ", [str(v) for v in vectors])
+    print("[DEBUG] # turns from path: ", turns)
+    print("[DEBUG] # moves from path: ", moves)
     return list_cmds
