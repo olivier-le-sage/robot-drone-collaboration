@@ -57,7 +57,7 @@ DEVICE = "/cpu:0"  # /cpu:0 or /gpu:0
 TEST_MODE = "inference"
 
 class TrashDetector:
-    
+
     def __init__(self, images_dir="images2"):
 
         print(ROOT_DIR)
@@ -443,7 +443,9 @@ class TrashDetector:
             plt.plot(y,x,linewidth=3)
             plt.show()
 
-        return listOfPoints, listOfDistances
+        init_pose = (rbt_x, rbt_y, rbt_angle)
+        robot_size = (rbt_width, rbt_height)
+        return listOfPoints, init_pose, robot_size
 
     def run(self, quiet_mode=False):
         '''

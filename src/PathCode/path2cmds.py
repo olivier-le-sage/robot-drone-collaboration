@@ -38,8 +38,8 @@ def gen_commands_from_path(path, init_pose, robot_size):
                 self.y1 = origin[1]
                 self.y2 = origin[1] + self.y
 
-                self.point1 = (self.x1, self.y1)
-                self.point2 = (self.x2, self.y2)
+                self.p1 = (self.x1, self.y1)
+                self.p2 = (self.x2, self.y2)
 
         def __repr__(self):
             return "("+str(self.origin)+", ("+str(self.x)+", "+str(self.y)+"))"
@@ -57,7 +57,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
             ''' dot product between this and another vector '''
             return self.x*other.x + self.y*other.y
 
-        def angle_between(self, other):
+        def angle_with(self, other):
             ''' returns the angle between this vector object and another '''
             return math.arccos(self.dot(self, other)/(self.get_mag()*other.get_mag()))
 
@@ -73,23 +73,6 @@ def gen_commands_from_path(path, init_pose, robot_size):
         # TBD!
         num_turns = math.floor(angle/MIN_TURN_ANGLE)
         return num_turns
-    # private helper function
-    def find_angles(point_list):
-        '''
-            Loops through a list of points and finds the angle
-            between each conneting line.
-        '''
-
-        ### Currently not really implemented. TBD! ###
-
-        for i in range(len(angles)-1):
-            #obj = AngleCalculator()
-            #cb = obj.angle_between(LineVectors[i][1], LineVectors[i+1][1])
-            # b= Angles[i].AngleCalculator
-            #Angles[i].angle_between((1, 0, 0), (0, 1, 0))
-
-            #Angles[i] = AngleCalculator.angle_between(LineVectors[i][1], LineVectors[i+1][1])
-        return
     # private helper function
     def pix2cm(vector_px, robot_size):
         '''
@@ -110,6 +93,8 @@ def gen_commands_from_path(path, init_pose, robot_size):
         # each axis scales by a different factor.
         robot_h_px = robot_size[1]
         robot_w_px = robot_size[0]
+        if robot_h_px < robot_w_px: # width shouldn't be bigger than height
+            robot_h_px, robot_w_px = robot_w_px, robot_h_px # fail-safe
         pixel_length_h = ROBOT_DIM_H/robot_h_px
         pixel_length_w = ROBOT_DIM_W/robot_w_px
 
@@ -129,22 +114,37 @@ def gen_commands_from_path(path, init_pose, robot_size):
 
         return vector_cm
 
-    ### THIS FUCTION IS NOT YET IMPLEMENTED ###
+    ### THIS FUNCTION IS STILL A WIP ###
 
-    # Tentative outline:
-    # 1. Take list of points and create vector objects
-    # 2a. Convert vectors to cm
-    # 2b. Loop through the vectors, calculating angles at each step
-    # 3. Convert to # of commands
+    # 1. Take list of points and create vector objects (converted to cm)
+    vectors = []
+    for p1, p2 in zip(path, path[1:]):
+        # extract vector from 2 consecutive points in the list
+        x = p2[0] - p1[0]
+        y = p2[1] - p1[1]
+        origin = p1
+
+        # convert from pixels to cmd
+        v_px  = LineVector(x, y, origin)
+        v_cm  = pix2cm(v_px, robot_size)
+
+        # append to list
+        vectors.append(v_cm)
+
+    # 2. Loop through the vectors, calculating angles/magnitudes at each step
+    #    then, compute the # of commands
+    turns = [] # same order as vector list
+    moves = [] # same order as vector list
+    for v1, v2 in zip(vectors, vectors[1:]):
+        theta = v1.angle_with(v2)
+        turns.append(calc_num_turns(theta, v1.p1, v1.p2))
+    for v in vectors:
+        moves.append(calc_num_moves(v))
+
     # 4. Generate list with commands and return it
+    # In general the commands go: 1) turn, 2) move forward, 3) stop, then repeat
+    list_cmds = []
 
-    #def Generate_Vectors():
+    # TBD: logic of this
 
-        #Generate vectors between all points
-       # for i in range(len(Points)-1):
-
-            #LineVectors[i] = LineVector.Generate_Vector(Points[i], Points[i+1])
-
-        #Generate vector between final point and origin point
-        #LineVectors[-1] = LineVector.Generate_Vector(Points[-1], Points[0])
-        #return
+    return list_cmds
