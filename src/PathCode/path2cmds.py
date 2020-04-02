@@ -88,7 +88,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
             # no need to turn
             direction = 1
 
-        num_turns = int(round(angle/MIN_TURN_ANGLE))
+        num_turns = int(round(v1.angle_with(v2)/MIN_TURN_ANGLE))
         return direction * num_turns
     # private helper function
     def pix2cm(vector_px, robot_size):
@@ -152,7 +152,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
     #    then, compute the # of commands
     turns = [] # same order as vector list
     moves = [] # same order as vector list
-    for v1, v2 in zip(vectors, vectors[1:]):
+    for v1, v2 in zip(vectors[1:], vectors[2:]):
         theta = v1.angle_with(v2)
         turns.append(calc_num_turns(theta, v1, v2))
     for v in vectors:
@@ -160,9 +160,10 @@ def gen_commands_from_path(path, init_pose, robot_size):
     # we need to add an extra turn at the beginning to correct robot orientation
     # first we take the robot pose and generate a vector to represent it
     rbt_angle_rad = init_pose[2] * (math.pi/180)
-    rbt_dir_v = LineVector(math.cos(init_pose[0]), math.sin(init_pose[1]),
+    rbt_dir_v = LineVector(math.cos(rbt_angle_rad), math.sin(rbt_angle_rad),
                            (init_pose[0], init_pose[1]) )
     turns.insert(0, calc_num_turns(rbt_angle_rad, rbt_dir_v, vectors[0]))
+    moves.pop(0) # remove the first move, which is always zero
 
     # 4. Generate list with commands and return it
     # In general the commands go: 1) turn, 2) move forward, 3) stop, then repeat
