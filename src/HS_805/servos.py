@@ -117,12 +117,13 @@ class ServoControl(Thread):
 
     def halt(self):
         '''
-            Forced stop.
+            Forced stop. Waits for a few seconds.
             Use in case neutral() doesn't work as intended.
             Brings the PWM outputs down to zero.
         '''
         self.left_servo_ctrl.ChangeDutyCycle(0)
         self.right_servo_ctrl.ChangeDutyCycle(0)
+        sleep(2)
         return
 
     def move_forward(self, seconds):

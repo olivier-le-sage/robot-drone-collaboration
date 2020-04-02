@@ -31,8 +31,7 @@ from mrcnn import visualize
 from mrcnn.visualize import display_images
 import mrcnn.model as modellib
 from mrcnn.model import log
-from trash import trash
-from Path import get_distances
+import src.Trash_Detector_Test.Trash_Detection.trash.trash as trash
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
@@ -40,7 +39,7 @@ from shapely.geometry.polygon import Polygon
 # Change in case you want to put the code somewhere else.
 
 ROOT_DIR = os.getcwd()
-print("[DEBUG] Current cwd is:", ROOT_DIR)
+# print("[DEBUG] Current cwd is:", ROOT_DIR)
 
 # Path to Trash trained weights
 TRASH_WEIGHTS_PATH = "weights/mask_rcnn_trash_0200_030519_large.h5" #the best
@@ -60,9 +59,9 @@ class TrashDetector:
 
     def __init__(self, images_dir="images2"):
 
-        print(ROOT_DIR)
+        print(ROOT_DIR+"/"+images_dir)
         # Import Mask RCNN
-        sys.path.append(ROOT_DIR)  # To find local version of the library
+        sys.path.append(ROOT_DIR+"/"+images_dir)
 
         # Directory to save logs and trained model
         MODEL_DIR = os.path.join(ROOT_DIR, "logs")
@@ -75,7 +74,7 @@ class TrashDetector:
         # TODO: This should be changed to the directory where the desired images are stored
 
         self.jpg = glob.glob(images_dir+"/*.jpg")
-        self.jpeg = glob.glob(images_dir+"*.jpeg")
+        self.jpeg = glob.glob(images_dir+"/*.jpeg")
         self.jpg.extend(self.jpeg)
         print("[DEBUG] List of images found: ", self.jpg)
 
@@ -429,10 +428,17 @@ class TrashDetector:
             listOfPoints.append(currentPoint[0])
             listOfDistances.append(absoluteShortest[1])
 
-        # Display final results
+        # Display final results (debugging purposes only)
         if not quiet_mode:
             print(listOfPoints)
-            distanceCM = get_distances(rbt_height, listOfDistances)
+
+            list_of_distances = []
+            pixel_length = 37/rbt_height
+            for distance in listOfDistances:
+                distanceInCM = float(distance) * pixel_length
+                list_of_distances.append(distanceInCM)
+            distanceCM = list_of_distances
+
             print("Distance between points is" + str(distanceCM))
             image = image_temp
             temp = skimage.io.imread('{}'.format(image))

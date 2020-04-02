@@ -58,21 +58,38 @@ def gen_commands_from_path(path, init_pose, robot_size):
             return self.x*other.x + self.y*other.y
 
         def angle_with(self, other):
-            ''' returns the angle between this vector object and another '''
+            '''
+                returns the angle between this vector object and another.
+                always gives the small angle, in radians.
+            '''
             return math.arccos(self.dot(self, other)/(self.get_mag()*other.get_mag()))
 
     # private helper function
     def calc_num_moves(vector):
         ''' returns the number of move commands required to move along a vector '''
-        num_moves = math.floor(vector.get_mag()/MIN_MOVE_DISTANCE)
+        num_moves = int(math.floor(vector.get_mag()/MIN_MOVE_DISTANCE))
         return num_moves
     # private helper function
-    def calc_num_turns(angle, point1, point2):
-        ''' returns the number of turns required to make a rotation '''
-        # /!\ Need to check point positions to determine turn direction /!\
-        # TBD!
-        num_turns = math.floor(angle/MIN_TURN_ANGLE)
-        return num_turns
+    def calc_num_turns(angle, v1, v2):
+        '''
+            returns the number of turns required to make a rotation.
+            A negative return value indicates counter-clkwise (left) direction.
+            A positive return value indicated clockwise (right) direction.
+        '''
+
+        x_unitv = LineVector(1, 0, (0,0)) # unit vector on x-axis
+        if v1.angle_with(x_unitv) < v2.angle_with(x_unitv):
+            # turn left
+            direction = -1 # 1 is clkwise, -1 is cntr-clkwise
+        elif v1.angle_with(x_unitv) > v2.angle_with(x_unitv):
+            # turn right
+            direction = 1 # 1 is clkwise, -1 is cntr-clkwise
+        else: # this shouldn't happen
+            # no need to turn
+            direction = 1
+
+        num_turns = int(math.floor(angle/MIN_TURN_ANGLE))
+        return direction * num_turns
     # private helper function
     def pix2cm(vector_px, robot_size):
         '''
@@ -137,14 +154,25 @@ def gen_commands_from_path(path, init_pose, robot_size):
     moves = [] # same order as vector list
     for v1, v2 in zip(vectors, vectors[1:]):
         theta = v1.angle_with(v2)
-        turns.append(calc_num_turns(theta, v1.p1, v1.p2))
+        turns.append(calc_num_turns(theta, v1, v2))
     for v in vectors:
         moves.append(calc_num_moves(v))
+    turns.append(0) # add an extra turn so the lists have the same length
 
     # 4. Generate list with commands and return it
     # In general the commands go: 1) turn, 2) move forward, 3) stop, then repeat
     list_cmds = []
+    for m, t in zip(moves, turns):
+        # turns
+        if t < 0:
+            list_cmds += ['pivot_turn_left'] * abs(t)
+        else:
+            list_cmds += ['pivot_turn_right'] * abs(t)
 
-    # TBD: logic of this
+        # moves
+        list_cmds += ['move_forward'] * m
+
+        # pause to allow picking up of garbage
+        list_cmds += ['halt']
 
     return list_cmds

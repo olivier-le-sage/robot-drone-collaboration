@@ -1072,7 +1072,7 @@ def rpn_bbox_loss_graph(config, target_bbox, rpn_match, rpn_bbox):
                                    config.IMAGES_PER_GPU)
 
     loss = smooth_l1_loss(target_bbox, rpn_bbox)
-    
+
     loss = K.switch(tf.size(input=loss) > 0, K.mean(loss), tf.constant(0.0))
     return loss
 
@@ -2376,7 +2376,7 @@ class MaskRCNN():
             max_queue_size=100,
             # Tuumade arv: meil on 12 tk olemas
             # Olen proovinud 1-ga, sellega töötas, time to try 4 now
-            workers=4, 
+            workers=4,
             # Muutsin from true to false
             use_multiprocessing=True,
         )

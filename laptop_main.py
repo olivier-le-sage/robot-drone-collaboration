@@ -75,7 +75,8 @@ bt_t = Thread(target=bluetooth_server)
 # print("Bluetooth started.")
 
 # initialize trash detection (and load images)
-td = trash_detect.TrashDetector()
+images = "src/Trash_Detector_Test/Trash_Detection/images2" # relative to this file
+td = trash_detect.TrashDetector(images_dir=images)
 
 # initialize MQTT Client
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,
