@@ -61,6 +61,7 @@ DEVICE = "/cpu:0"  # /cpu:0 or /gpu:0
 TEST_MODE = "inference"
 
 class TrashDetector:
+    dataset = None
 
     def __init__(self, images_dir="images2"):
 
@@ -91,11 +92,11 @@ class TrashDetector:
             IMAGES_PER_GPU = 1
 
         # Load validation dataset
-        dataset = trash.TrashDataset()
-        dataset.load_trash(TRASH_DIR, "val")
+        self.dataset = trash.TrashDataset()
+        self.dataset.load_trash(TRASH_DIR, "val")
 
         # Must call before using the dataset
-        dataset.prepare()
+        self.dataset.prepare()
 
         # Create model in inference mode
         with tf.device(DEVICE):
@@ -472,6 +473,32 @@ class TrashDetector:
             image_results += [(image, point_list, init_pose, robot_size)]
 
         return image_results
+
+    def verify_trash(self, image, quiet_mode=False):
+        trash_detected = False
+        # Save a temporary variable for image so that we can reread it after and then
+        # import the image with imread.
+        image_temp = image
+        image = skimage.io.imread('{}'.format(image))
+
+        # Run object detection
+        results = self.model.detect([image], verbose=1)
+
+        # Save results as r
+        r = results[0]
+
+        mask = r['masks']
+        mask = mask.astype(int)
+        if(mask.shape[2] != 0):
+            trash_detected = True
+
+            if not quiet_mode:
+                visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+                                            self.dataset.class_names, r['scores'],
+                                            title="Predictions")
+
+        return trash_detected
+
 
 if __name__ == '__main__':
     trash_detector = TrashDetector()

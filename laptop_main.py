@@ -12,6 +12,11 @@
 #   - path planning
 # The outputs from these algorithms are then communicated to the robot via MQTT.
 
+'''
+To call verification method use this command
+'''
+# verification_test = td.verify_trash(images+"/demo_pic.jpg",quiet_mode=False)
+
 import sys
 import bluetooth as bt # pybluez
 import datetime as dt

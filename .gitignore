@@ -3,3 +3,4 @@ lib/GPS_lib/bin/
 src/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5
 *.pyc
 *.pyo
+/src/Trash_Detection/weights/mask_rcnn_coco.h5
