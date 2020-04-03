@@ -30,6 +30,8 @@ import lib
 #import MQTTSN # this import fails because the module isn't found
 from mqtt_sender import MQTTSender
 import paho.mqtt.client as mqtt
+import paho.mqtt.subscribe as subscribe
+import paho.mqtt.publish as publish
 import proto
 import proto.bin.message_defs_pb2 as message_defs_pb2
 
@@ -45,7 +47,12 @@ LOCAL_BROKER    = "localhost"
 MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
 MQTT_CLIENT_ID  = '7061fe2823fe4375bcdadfbf14f184c8' # random md5 hash
 
-SUB_TOPICS = ['olivier-le-sage/land-robot/move']
+SUB_TOPICS = ['olivier-le-sage/land-robot/move',
+              'olivier-le-sage/land-robot/status',
+              'olivier-le-sage/land-robot/mpu6050',
+              'olivier-le-sage/land-robot/ping']
+
+QUIET_MODE = True
 
 ####### Bluetooth server ######
 
@@ -67,6 +74,11 @@ def bluetooth_server():
         print(data) # for now we simply print
         # in the future we will also manipulate the data
 
+####### Message Handling ######
+
+def on_message(client, userdata, msg):
+    print("[STATUS] %s | %s" % (msg.topic, msg.payload))
+
 ############ Main #############
 
 # Start the bluetooth server
@@ -80,26 +92,46 @@ td = trash_detect.TrashDetector(images_dir=images)
 
 # initialize MQTT Client
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,
-                                sub_topics=SUB_TOPICS)
+                                sub_topics=SUB_TOPICS, QoS_level=2)
 # mqtt_interface.subscribe("olivier-le-sage/land-robot/move")
-mqtt_interface.start() # run mqtt_interface as a thread
+# mqtt_interface.start() # run mqtt_interface as a thread
 
 # 1. Receive images from the drone
 # Nothing to do here as we will be loading sample images for the demo
+print("[STATUS] Receiving images from drone.")
 
 # 2. Process images and generate path + initial location/pose of the robot
-print("Processing images... please wait.")
-point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=False)
-print("Trash detection complete.")
+print("[STATUS] Processing images... please wait.")
+point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=QUIET_MODE)
+print("[STATUS] Trash detection complete.")
 
 # 3. Convert path to instructions
 commands = gen_commands_from_path(point_list, pose, size)
 
 # 4. Send instructions to robot via MQTT payloads
 print("[DEBUG] Commands generated from path: \n", commands)
+to_publish = []
+for cmd in commands:
+    robot_cmd = message_defs_pb2.MoveCommand()
+    robot_cmd.name = cmd
+    if (cmd == 'move_forward') or (cmd == 'move_backward'):
+        robot_cmd.arg1 = 1 # let's say 1 sec = 10 cm
+    if (cmd == 'pivot_turn_left') or (cmd == 'pivot_turn_right'):
+        robot_cmd.arg1 = 1 # let's say 1 sec = 10 degrees
+
+    #mqtt_interface.publish('olivier-le-sage/land-robot/move',
+    #                        robot_cmd.SerializeToString())
+
+    to_publish.append( ('olivier-le-sage/land-robot/move',
+                        robot_cmd.SerializeToString(), 2, False) )
+
+# for the demo we'll just publish the whole list
+publish.multiple(to_publish, hostname=MQTT_BROKER, client_id=MQTT_CLIENT_ID)
+
+# Then very simple subscribe to any topics we want to (blocking call)
+subscribe.callback(on_message, SUB_TOPICS, hostname=MQTT_BROKER)
 
 ##### Interactive demo given in February 2020 #####
-
 def run_interactive_demo():
     # For now we'll keep it simple -- a while loop where the user decides which
     #     command to send to the robot

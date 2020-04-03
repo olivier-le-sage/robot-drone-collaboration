@@ -81,7 +81,7 @@ class TrashDetector:
         self.jpg = glob.glob(images_dir+"/*.jpg")
         self.jpeg = glob.glob(images_dir+"/*.jpeg")
         self.jpg.extend(self.jpeg)
-        print("[DEBUG] List of images found: ", self.jpg)
+        #print("[DEBUG] List of images found: ", self.jpg)
 
         # Override the training configurations with a few
         # changes for inferencing.
@@ -401,7 +401,8 @@ class TrashDetector:
         # STARTING POINT OF ROBOT
         #--------------------------------------------------------------------------
         rbt_x,rbt_y,rbt_angle,rbt_width,rbt_height = self.get_init_pose(image_temp, quiet_mode)
-        print("Robot found at: (",rbt_x,"px,",rbt_y,"px,",rbt_angle,"deg)")
+        if not quiet_mode:
+            print("Robot found at: (",rbt_x,"px,",rbt_y,"px,",rbt_angle,"deg)")
         currentPoint = [(rbt_y, rbt_x)]
         listOfPoints.append(currentPoint[0])
 
@@ -424,10 +425,10 @@ class TrashDetector:
             # currentPoint, add it to the listOfPoints and then set it as the new currentPoint
 
             currentPoint
-            print(listOfShortest)
+            #print(listOfShortest)
             absoluteShortest = min(listOfShortest, key=lambda x: x[1])
-            print("Shortest point is " + str(absoluteShortest[0]) + " and the distance to it is: " + str(absoluteShortest[1])) ##Print the distance to the shortest point.
-            print(absoluteShortest[2])
+            #print("Shortest point is " + str(absoluteShortest[0]) + " and the distance to it is: " + str(absoluteShortest[1])) ##Print the distance to the shortest point.
+            #print(absoluteShortest[2])
             mask = np.delete(mask,absoluteShortest[2], 2)
             currentPoint = [(absoluteShortest[0][0],absoluteShortest[0][1])]
             listOfPoints.append(currentPoint[0])

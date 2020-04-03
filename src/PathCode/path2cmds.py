@@ -181,7 +181,7 @@ def gen_commands_from_path(path, init_pose, robot_size):
         # pause to allow picking up of garbage
         list_cmds += ['halt']
 
-    print("[DEBUG] Vectors from path: ", [str(v) for v in vectors])
+    # print("[DEBUG] Vectors from path: ", [str(v) for v in vectors])
     print("[DEBUG] # turns from path: ", turns)
     print("[DEBUG] # moves from path: ", moves)
     return list_cmds

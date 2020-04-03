@@ -52,7 +52,7 @@ class MQTTSender(Thread):
 
         # we connect asynchronously so that loop_start() will attempt to
         # re-connect in the event of a connection failure
-        self.client.connect_async(self.broker, DEFAULT_PORT, 60)
+        self.client.connect(self.broker, DEFAULT_PORT, 60)
 
     # callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
@@ -100,5 +100,5 @@ class MQTTSender(Thread):
         # Other loop*() functions are available that give a threaded interface and a
         # manual interface.
 
-        # self.client.loop_start() # starts a thread, non-blocking
+        #self.client.loop_start() # starts a thread, non-blocking
         self.client.loop_forever() # blocking call (never returns)

@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 from threading import Thread
 from queue import Queue
+from ..Trash_Detection.TrashDetector import verify_trash
 
 # set GPIO mode to BCM (NB: not the physical pin numbers)
 GPIO.setmode(GPIO.BOARD)
@@ -240,13 +241,27 @@ class ServoControl(Thread):
                 else:
                     if function.strip() == 'move_forward':
                         self.move_forward(args[0])
+                        print("[STATUS] Robot moved forward 10 cm!")
                     elif function.strip() == 'move_backward':
                         self.move_backward(args[0])
+                        print("[STATUS] Robot moved backward 10 cm!")
                     elif function.strip() == 'pivot_turn_left':
                         self.pivot_turn_left(args[0])
+                        print("[STATUS] Robot turned left 10 degrees!")
                     elif function.strip() == 'pivot_turn_right':
                         self.pivot_turn_right(args[0])
+                        print("[STATUS] Robot turned right 10 degrees!")
                     elif function.strip() == 'neutral':
                         self.neutral()
+                        print("[STATUS] Robot put gear to neutral.")
                     elif function.strip() == 'halt':
+                        # As halt is being called, call the camera function
+                        # This will take a picture and run inference on it
+                        # The robot will not resume movement until inference is done
+                        print("[STATUS] Robot has stopped in front of an object. Checking...")
+                        is_trash = verify_trash()
+                        if is_trash:
+                            print("[STATUS] Robot has identified trash! Picking up now.")
+                        else:
+                            print("[STATUS] The object is not trash. Moving to next object.")
                         self.halt()
