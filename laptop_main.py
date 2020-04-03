@@ -12,15 +12,17 @@
 #   - path planning
 # The outputs from these algorithms are then communicated to the robot via MQTT.
 
+
 '''
 To call verification method use this command
 '''
-# verification_test = td.verify_trash(images+"/demo_pic.jpg",quiet_mode=False)
+# verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=False)
 
 import sys
 import bluetooth as bt # pybluez
 import datetime as dt
 from threading import Thread
+import subprocess
 from queue import Queue
 
 # Add module scripts one-by-one at runtime
@@ -39,6 +41,8 @@ import paho.mqtt.subscribe as subscribe
 import paho.mqtt.publish as publish
 import proto
 import proto.bin.message_defs_pb2 as message_defs_pb2
+import pathlib
+import time
 
 ########## Constants ##########
 
@@ -52,12 +56,39 @@ LOCAL_BROKER    = "localhost"
 MQTT_BROKER     = ECLIPSE_BROKER # provisionally working
 MQTT_CLIENT_ID  = '7061fe2823fe4375bcdadfbf14f184c8' # random md5 hash
 
+
 SUB_TOPICS = ['olivier-le-sage/land-robot/move',
               'olivier-le-sage/land-robot/status',
               'olivier-le-sage/land-robot/mpu6050',
               'olivier-le-sage/land-robot/ping']
 
 QUIET_MODE = True
+
+piPhysicalAddr = 'dc-a6-32-2e-b9-a8'
+
+command1 = 'netsh interface ip show addresses "Local Area Connection* 12"'
+process1 = subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=None, shell=True)
+output1 = process1.communicate()
+netsh = output1[0].decode("utf-8")
+netstring = netsh.split()
+ipaddr = netstring[12]
+
+# Takes the retrieved IP address and adds it to the "arp" command which
+# retrieves all IP addresses connected to ipaddr
+maincom = 'arp -a -N ' + ipaddr
+
+# Inputs the arp command into the terminal to get the list of connected
+# devices and IP addresses and then searches through them to find the
+# one associated with piPhysicalAddr (MAC address of pi)
+command2 = 'arp -a -N ' + ipaddr
+command2 = 'arp -a -N ' + ipaddr
+process2 = subprocess.Popen(command2, stdout=subprocess.PIPE, stderr=None, shell=True)
+output2 = process2.communicate()
+arpdecoded = output2[0].decode("utf-8")
+arpstring = arpdecoded.split()
+for i in range(len(arpstring)):
+    if arpstring[i] == piPhysicalAddr:
+        rtmpip = arpstring[i - 1]
 
 ####### Bluetooth server ######
 
@@ -84,6 +115,20 @@ def bluetooth_server():
 def on_message(client, userdata, msg):
     print("[STATUS] %s | %s" % (msg.topic, msg.payload))
 
+def perform_verification():
+    images = "src/Trash_Detection/images2"  # relative to this file
+    ROOT_DIR = str(pathlib.Path(__file__).parent.absolute())
+    print(ROOT_DIR)
+
+    # command3 is the terminal command that connects to the RTMP stream and
+    # then captures and image from it. See onClick function for more.
+    command3 = r'ffmpeg -y -i rtmp://' + rtmpip + \
+               r'/live/test -vframes 1 "' + ROOT_DIR + '/src/Trash_Detection/images2/verification%03d.jpg"'
+    print(command3)
+    process = subprocess.Popen(command3, stdout=subprocess.PIPE, stderr=None, shell=True)
+    output = process.communicate()
+
+
 ############ Main #############
 
 # Start the bluetooth server
@@ -94,6 +139,11 @@ bt_t = Thread(target=bluetooth_server)
 # initialize trash detection (and load images)
 images = "src/Trash_Detection/images2" # relative to this file
 td = trash_detect.TrashDetector(images_dir=images)
+
+perform_verification()
+time.sleep(5)
+verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=False)
+print(verification_test)
 
 # initialize MQTT Client
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,
