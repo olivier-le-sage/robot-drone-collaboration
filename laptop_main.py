@@ -140,10 +140,10 @@ bt_t = Thread(target=bluetooth_server)
 images = "src/Trash_Detection/images2" # relative to this file
 td = trash_detect.TrashDetector(images_dir=images)
 
-perform_verification()
-time.sleep(5)
-verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=False)
-print(verification_test)
+# perform_verification()
+# time.sleep(5)
+# verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=False)
+# print(verification_test)
 
 # initialize MQTT Client
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,

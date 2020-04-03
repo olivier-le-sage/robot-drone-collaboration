@@ -111,9 +111,12 @@ ping_interface = ping.Ultrasonic(PING_TRIG_PIN) # initialize PING sensor interfa
 mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME)
 mqtt_interface.start() # start mqtt client thread in bg
 
-os.system('raspivid -o - -t 0 -hf -fps 10 -b 5000000 | ffmpeg -re -ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 '
-          '-i /dev/zero -f h264 -i - -vcodec copy -acodec aac -ab 128k -g 50 -strict experimental -f flv '
-          'rtmp://192.168.137.5/live/test')
+
+### use when connecting to camera for trash verification (commented out for live demo) ###
+
+# os.system('raspivid -o - -t 0 -hf -fps 10 -b 5000000 | ffmpeg -re -ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 '
+#           '-i /dev/zero -f h264 -i - -vcodec copy -acodec aac -ab 128k -g 50 -strict experimental -f flv '
+#           'rtmp://192.168.137.5/live/test')
 
 
 
