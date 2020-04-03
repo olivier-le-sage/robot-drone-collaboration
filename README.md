@@ -13,7 +13,7 @@ autonomous collection. The proposed idea was to have a drone fly above
 a given area, use video streaming to find whatever it is that needs to
 be collected using image processing and a neural network trained to detect
 the desired object(s), and then send commands to our land based robot to
-collect it. 
+collect it.
 
 By separating the concerns in this way, the system can easily be adapted
 to different scenarios. One example of a simple adaptation could be cleaning
@@ -24,8 +24,10 @@ water could be used.
 ## Hardware
 * DJI Phantom 4
 * Land robot:
-    * Chassis consisting of tracks, servo motors, and breadboard
-    * Accelerometers
+    * Chassis consisting of tracks, servo motors, breadboard
+    * IMUs
+    * GPS
+    * PING ultrasound sensor
     * Raspberry Pi 4
     * PiCamera v2
 * Laptop
