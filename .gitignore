@@ -3,3 +3,12 @@ lib/GPS_lib/bin/
 src/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5
 *.pyc
 *.pyo
+/src/Trash_Detection/weights/mask_rcnn_coco.h5
+/laptop_main_BACKUP_3980.py
+/laptop_main_BACKUP_43192.py
+/laptop_main_BASE_3980.py
+/laptop_main_BASE_43192.py
+/laptop_main_LOCAL_3980.py
+/laptop_main_LOCAL_43192.py
+/laptop_main_REMOTE_3980.py
+/laptop_main_REMOTE_43192.py

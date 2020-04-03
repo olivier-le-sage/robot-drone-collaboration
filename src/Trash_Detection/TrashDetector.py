@@ -36,16 +36,18 @@ from .mrcnn import model as modellib
 from .trash import trash
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+import pathlib
 
 # Root directory of the project.
 # Change in case you want to put the code somewhere else.
 
-ROOT_DIR = os.getcwd()
+#ROOT_DIR = os.getcwd()
+ROOT_DIR = str(pathlib.Path(__file__).parent.absolute())
 # print("[DEBUG] Current cwd is:", ROOT_DIR)
 
 # Path to Trash trained weights (from project root)
 # TODO: Update path to weights folder if it changes
-TRASH_WEIGHTS_PATH = "src/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5" # the best
+TRASH_WEIGHTS_PATH = r"\weights\mask_rcnn_trash_0200_030519_large.h5" # the best
 
 # Device to load the neural network on.
 # Useful if you're training a model on the same
@@ -59,6 +61,7 @@ DEVICE = "/cpu:0"  # /cpu:0 or /gpu:0
 TEST_MODE = "inference"
 
 class TrashDetector:
+    dataset = None
 
     def __init__(self, images_dir="images2"):
 
@@ -89,18 +92,18 @@ class TrashDetector:
             IMAGES_PER_GPU = 1
 
         # Load validation dataset
-        dataset = trash.TrashDataset()
-        dataset.load_trash(TRASH_DIR, "val")
+        self.dataset = trash.TrashDataset()
+        self.dataset.load_trash(TRASH_DIR, "val")
 
         # Must call before using the dataset
-        dataset.prepare()
+        self.dataset.prepare()
 
         # Create model in inference mode
         with tf.device(DEVICE):
             self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,config=config)
 
         # Load the weights you trained
-        weights_path = os.path.join(ROOT_DIR, TRASH_WEIGHTS_PATH)
+        weights_path = ROOT_DIR + '/' + TRASH_WEIGHTS_PATH
         self.model.load_weights(weights_path, by_name=True)
 
     def get_init_pose(self, image, quiet_mode=False):
@@ -470,6 +473,32 @@ class TrashDetector:
             image_results += [(image, point_list, init_pose, robot_size)]
 
         return image_results
+
+    def verify_trash(self, image, quiet_mode=False):
+        trash_detected = False
+        # Save a temporary variable for image so that we can reread it after and then
+        # import the image with imread.
+        image_temp = image
+        image = skimage.io.imread('{}'.format(image))
+
+        # Run object detection
+        results = self.model.detect([image], verbose=1)
+
+        # Save results as r
+        r = results[0]
+
+        mask = r['masks']
+        mask = mask.astype(int)
+        if(mask.shape[2] != 0):
+            trash_detected = True
+
+            if not quiet_mode:
+                visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+                                            self.dataset.class_names, r['scores'],
+                                            title="Predictions")
+
+        return trash_detected
+
 
 if __name__ == '__main__':
     trash_detector = TrashDetector()
