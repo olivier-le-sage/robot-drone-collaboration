@@ -27,6 +27,7 @@ import src
 from src.HS_805.servos import ServoControl
 from src.MPU_6050.MPU6050Interface import MPU6050Interface
 import src.Ping_Ultrasonic.PING_Ultrasonic as ping
+from src.Trash_Detection.TrashDetector import verify_trash
 import lib
 # import lib.MQTTSN_Python.MQTTSNclient.py
 import proto
@@ -179,7 +180,7 @@ ping_interface.single_test()
 servo_interface.start() # will invoke run() in a separate thread
 
 # start ultrasonic ping sensor thread
-ping_interface.start()
+#ping_interface.start()
 
 ########## Main Loop ##########
 
@@ -212,6 +213,17 @@ while True:
     # retrieve from mqtt interface message Queue
     if not mqtt_interface.message_q.empty():
         instr = mqtt_interface.message_q.get()
+
+        ##### MESSAGE INTERPRETATIONS FOR APR 2020 DEMO #####
+        # if the topic is the status topic:
+        if instr[0] == 'olivier-le-sage/land-robot/status':
+            # assume payload is just a plain string
+            status_info = str(instr[1])
+
+            # interpret the string
+            if status_info == "take_picture":
+                # command to take a picture with the camera
+                # call function
 
         # if the topic is the servo topic, pass the payload to the servo interf
         if instr[0] == 'olivier-le-sage/land-robot/move':
