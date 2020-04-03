@@ -1,13 +1,16 @@
 #-------------------
 # Imports
 #-------------------
+
 import tkinter as tk
 from PIL import ImageTk, Image
 import subprocess
-import TrashDetector as Trash
+from src.Trash_Detection import TrashDetector as Trash
 from PIL import Image
 from PIL import ImageTk
+import pathlib
 import os
+
 
 
 #--------------------------------------------------------------------------
@@ -19,7 +22,7 @@ piPhysicalAddr = 'dc-a6-32-2e-b9-a8'
 
 
 # This section inputs command1 into the terminal in order to retrieve the
-# IP address of the Hotspot created. It may need to be chnaged is the
+# IP address of the Hotspot created. It may need to be changed if the
 # hotspot is not created through Windows settings.
 command1 = 'netsh interface ip show addresses "Local Area Connection* 12"'
 process1 = subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -29,7 +32,7 @@ netstring = netsh.split()
 ipaddr = netstring[12]
 
 # Takes the retrieved IP address and adds it to the "arp" command which
-# retrieves all IP addresses conected to ipaddr
+# retrieves all IP addresses connected to ipaddr
 maincom = 'arp -a -N ' + ipaddr
 
 
@@ -47,7 +50,9 @@ for i in range(len(arpstring)):
         rtmpip = arpstring[i-1]
 
 
-td = Trash.TrashDetector()
+images = "src/Trash_Detection/images2" # relative to this file
+td = Trash.TrashDetector(images_dir=images)
+
 
 
 
@@ -61,7 +66,7 @@ td = Trash.TrashDetector()
 
 win = tk.Tk()	#initialize a window for the GUI
 runDisplayed = False
-ROOT_DIR = os.getcwd()
+ROOT_DIR = str(pathlib.Path(__file__).parent.absolute())
 print(ROOT_DIR)
 
 # command3 is the terminal command that connects to the RTMP stream and
@@ -79,8 +84,24 @@ print(command3)
 def onClick(label):
     process = subprocess.Popen(command3, stdout=subprocess.PIPE, stderr=None, shell=True)
     output = process.communicate()
-    img = Image.open("images2\img001.jpg")
+    img = Image.open("src/Trash_Detection/images2/img001.jpg")
     img = img.resize((500,281), Image.ANTIALIAS)
+    photoImg =  ImageTk.PhotoImage(img)
+    #CLabel = tk.Label(win, image=photoImg)
+    label.configure(image=photoImg)
+    label.img = photoImg
+    label.pack()
+    global runDisplayed
+    if not runDisplayed:
+        runDetectionText = tk.Label(win, text="Click to perform detection on image")
+        runDetectionText.pack()
+        detectionButton = tk.Button(win, text="Run", fg="green", command=onClick2)
+        detectionButton.pack()
+        runDisplayed = True
+
+def onClick1(label):
+    img = Image.open(ROOT_DIR + "/src/Trash_Detection/images2/demo_pic.jpg")
+    img = img.resize((281,500), Image.ANTIALIAS)
     photoImg =  ImageTk.PhotoImage(img)
     #CLabel = tk.Label(win, image=photoImg)
     label.configure(image=photoImg)
@@ -98,13 +119,13 @@ def onClick(label):
 # trash detection on the picture stored in the directory after the "Capture"
 # button was clicked.
 def onClick2():
-	td.run()
+	point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=False)
     
 
 # The following code initializes the GUI window
 
 win.title("Robot-Drone-App")	#Set title of the window
-win.geometry("500x500")		#Set window dimensions to 500x500
+win.geometry("700x700")		#Set window dimensions to 500x500
 win.resizable(False, False)		#Don't make window resizable in x or y
 
 tk.Label(win, text="Ensure mobile hotspot is turned on and camera is streaming before starting!",\
@@ -113,7 +134,7 @@ tk.Label(win, text="Ensure mobile hotspot is turned on and camera is streaming b
 CLabel = tk.Label(win)
 
 tk.Label(win, text="Click to capture image").pack()		#Button label	
-tk.Button(win, text="Capture", fg="red", command= lambda: onClick(CLabel)).pack()	#"Capture" button
+tk.Button(win, text="Capture", fg="red", command= lambda: onClick1(CLabel)).pack()	#"Capture" button
 
 
 

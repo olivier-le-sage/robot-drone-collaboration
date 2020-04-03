@@ -75,7 +75,6 @@ bt_t = Thread(target=bluetooth_server)
 # print("Bluetooth started.")
 
 # initialize trash detection (and load images)
-# TODO: use a function call to get this directory so that it's more stable
 images = "src/Trash_Detection/images2" # relative to this file
 td = trash_detect.TrashDetector(images_dir=images)
 
@@ -89,7 +88,7 @@ mqtt_interface.start() # run mqtt_interface as a thread
 # Nothing to do here as we will be loading sample images for the demo
 
 # 2. Process images and generate path + initial location/pose of the robot
-print("Procssing images... please wait.")
+print("Processing images... please wait.")
 point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=False)
 print("Trash detection complete.")
 

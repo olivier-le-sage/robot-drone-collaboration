@@ -36,16 +36,18 @@ from .mrcnn import model as modellib
 from .trash import trash
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+import pathlib
 
 # Root directory of the project.
 # Change in case you want to put the code somewhere else.
 
-ROOT_DIR = os.getcwd()
+#ROOT_DIR = os.getcwd()
+ROOT_DIR = str(pathlib.Path(__file__).parent.absolute())
 # print("[DEBUG] Current cwd is:", ROOT_DIR)
 
 # Path to Trash trained weights (from project root)
 # TODO: Update path to weights folder if it changes
-TRASH_WEIGHTS_PATH = "src/Trash_Detection/weights/mask_rcnn_trash_0200_030519_large.h5" # the best
+TRASH_WEIGHTS_PATH = r"\weights\mask_rcnn_trash_0200_030519_large.h5" # the best
 
 # Device to load the neural network on.
 # Useful if you're training a model on the same
@@ -100,7 +102,7 @@ class TrashDetector:
             self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,config=config)
 
         # Load the weights you trained
-        weights_path = os.path.join(ROOT_DIR, TRASH_WEIGHTS_PATH)
+        weights_path = ROOT_DIR + '/' + TRASH_WEIGHTS_PATH
         self.model.load_weights(weights_path, by_name=True)
 
     def get_init_pose(self, image, quiet_mode=False):
