@@ -64,31 +64,37 @@ SUB_TOPICS = ['olivier-le-sage/land-robot/move',
 
 QUIET_MODE = True
 
-piPhysicalAddr = 'dc-a6-32-2e-b9-a8'
+# Code run in video
+############################################################################################
 
-command1 = 'netsh interface ip show addresses "Local Area Connection* 12"'
-process1 = subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=None, shell=True)
-output1 = process1.communicate()
-netsh = output1[0].decode("utf-8")
-netstring = netsh.split()
-ipaddr = netstring[12]
+# piPhysicalAddr = 'dc-a6-32-2e-b9-a8'
+#
+# command1 = 'netsh interface ip show addresses "Local Area Connection* 12"'
+# process1 = subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=None, shell=True)
+# output1 = process1.communicate()
+# netsh = output1[0].decode("utf-8")
+# netstring = netsh.split()
+# ipaddr = netstring[12]
 
 # Takes the retrieved IP address and adds it to the "arp" command which
 # retrieves all IP addresses connected to ipaddr
-maincom = 'arp -a -N ' + ipaddr
+# maincom = 'arp -a -N ' + ipaddr
 
 # Inputs the arp command into the terminal to get the list of connected
 # devices and IP addresses and then searches through them to find the
 # one associated with piPhysicalAddr (MAC address of pi)
-command2 = 'arp -a -N ' + ipaddr
-command2 = 'arp -a -N ' + ipaddr
-process2 = subprocess.Popen(command2, stdout=subprocess.PIPE, stderr=None, shell=True)
-output2 = process2.communicate()
-arpdecoded = output2[0].decode("utf-8")
-arpstring = arpdecoded.split()
-for i in range(len(arpstring)):
-    if arpstring[i] == piPhysicalAddr:
-        rtmpip = arpstring[i - 1]
+
+# command2 = 'arp -a -N ' + ipaddr
+# command2 = 'arp -a -N ' + ipaddr
+# process2 = subprocess.Popen(command2, stdout=subprocess.PIPE, stderr=None, shell=True)
+# output2 = process2.communicate()
+# arpdecoded = output2[0].decode("utf-8")
+# arpstring = arpdecoded.split()
+# for i in range(len(arpstring)):
+#     if arpstring[i] == piPhysicalAddr:
+#         rtmpip = arpstring[i - 1]
+
+###########################################################################################
 
 ####### Bluetooth server ######
 
