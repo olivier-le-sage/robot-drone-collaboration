@@ -148,7 +148,7 @@ td = trash_detect.TrashDetector(images_dir=images)
 
 # perform_verification()
 # time.sleep(5)
-# verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=False)
+# verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=QUIET_MODE)
 # print(verification_test)
 
 # initialize MQTT Client
