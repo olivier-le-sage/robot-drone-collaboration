@@ -235,6 +235,8 @@ while True:
             if status_info == "take_picture":
                 # command to take a picture with the camera
                 # call function
+                print("[STATUS] Robot taking picture of the object.")
+            # else: do nothing
 
         # if the topic is the servo topic, pass the payload to the servo interf
         if instr[0] == 'olivier-le-sage/land-robot/move':
