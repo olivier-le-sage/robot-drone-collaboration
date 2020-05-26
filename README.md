@@ -43,7 +43,7 @@ Each object is represented as a mask which is essentially a list of pixels that 
 our first test of the model which shows each object as well as it's respective boundary box, mask, and accuracy prediction.
 
 
-![Prediction Results](docs/image_masks.png "Prediction Results")
+[Prediction Results](docs/image_masks.png "Prediction Results")
 
 More examples can be found in the notebook used to write this section: ![Trash Detection](src/Trash_Detection/Detect_trash_on_images.ipynb) 
 
@@ -56,7 +56,7 @@ a contour hierarchy list.
 Below is an example of an image of our land vehicle and several objects that was run through this process.
 
 
-![Contours](docs/Contours.png "CV2 Contours")
+![Contours](docs/Contours.PNG "CV2 Contours")
 
 We implemented a very simple and rudimentary solution of taking the largest countour area as our land vehicle. For our
 testing and demonstration purposes this was enough as we always used garbage that was smaller. Please see the final note
