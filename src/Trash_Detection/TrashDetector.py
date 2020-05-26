@@ -284,10 +284,11 @@ class TrashDetector:
         cv2.circle(orig, (int(rx), int(ry)), 10, (0, 255, 255), -1)
         cv2.circle(orig, (int(px), int(py)), 10, (0, 255, 255), -1)
 
-        # TODO: Figure out which lines are front/back vs sides of robot. Use the average of their lengths,
+        #  Figure out which lines are front/back vs sides of robot. Use the average of their lengths,
         #  shorter ones are front/back. Find the angle of the sides with respect to y axis (?). Create a vector
         #  starting at the robots midpoint and ending at the post-its midpoint. This vector points toward the back of
         #  the robot, so the front should be the opposite direction.
+
         # set post-it as 0,0 then calculate the robot center as a point around it
         rx_rel = rx - px
         ry_rel = ry - py
