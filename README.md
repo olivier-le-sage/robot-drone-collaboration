@@ -50,7 +50,7 @@ More examples can be found in the notebook used to write this section: [Trash De
 ### Robot Detection
 Due to time restraints and lack of available training pictures of our robot, we decided to use OpenCV and contour
 detection to find our robot in the image. We grey-scaled and blurred the image slightly, performed edge detection, and
-finally used a combination of dilation and erosion to close gaps. We then used the findContours function in CV2 to create
+then used a combination of dilation and erosion to close gaps. Finally we used the findContours function in CV2 to create
 a contour hierarchy list.
 
 Below is an example of an image of our land vehicle and several objects that was run through this process.
