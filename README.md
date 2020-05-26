@@ -43,9 +43,9 @@ Each object is represented as a mask which is essentially a list of pixels that 
 our first test of the model which shows each object as well as it's respective boundary box, mask, and accuracy prediction.
 
 
-[Prediction Results](docs/image_masks.png "Prediction Results")
+![Prediction Results](docs/image_masks.png "Prediction Results")
 
-More examples can be found in the notebook used to write this section: ![Trash Detection](src/Trash_Detection/Detect_trash_on_images.ipynb) 
+More examples can be found in the notebook used to write this section: [Trash Detection](src/Trash_Detection/Detect_trash_on_images.ipynb) 
 
 ### Robot Detection
 Due to time restraints and lack of available training pictures of our robot, we decided to use OpenCV and contour
