@@ -68,3 +68,13 @@ midpoint of the sticky note and the midpoint of the robot we created a vector po
 facing. We used the average angle of the sides of the robot to calculate the actual angle on a cartesian system as they
 are longer and give a more accurate measurement.
 
+![Robot Orientation](docs/Robot_Orientation.PNG)
+
+### Path Planning
+Path planning was also implemented with a fairly rudimentary solution with the intention on refining the actual decision
+later on. Currently the system finds the closest point of each piece of garbage by transposing each items mask and running
+the points through cdist(). For each object we store the closest point and then simply choose the closest object as the
+next one to go to. This can be replaced by a more advanced path planning algorithm quite easily at a later date.
+
+
+
