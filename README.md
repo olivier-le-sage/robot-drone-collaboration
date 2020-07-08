@@ -74,7 +74,45 @@ are longer and give a more accurate measurement.
 Path planning was also implemented with a fairly rudimentary solution with the intention on refining the actual decision
 later on. Currently the system finds the closest point of each piece of garbage by transposing each items mask and running
 the points through cdist(). For each object we store the closest point and then simply choose the closest object as the
-next one to go to. This can be replaced by a more advanced path planning algorithm quite easily at a later date.
+next one to go to. This can be replaced or enhanced by a more advanced path planning algorithm quite easily at a later date.
+The x-y coordinates representing the location of each piece of garbage are stored in the order they will be visited in a
+simple list.
+
+### Command Generation
+The list of locations, as well as the starting point and orientation of the robot, are then passed to the command generation
+portion of the program. Since the locations were simply pixels in the image, we required a method to turn distance between
+pixels into real distances. Our solution was to use the robot as a standard measurement since we knew it would always be
+in our photo and we knew the size of it. Therefore the program measures the distance between sides of the robot in the
+picture and uses this to create a standard distance for a given number of pixels. It then converts all of the paths between
+pieces of garbage into their real distances and calculates the number and order of turn and move forward commands the robot
+requires to reach each piece.
+
+An example of the output:
+
+['pivot_turn_left', 'pivot_turn_left', 'move_forward', 'move_forward', 'move_forward', 'move_forward', 'move_forward', 
+'move_forward', 'move_forward', 'move_forward', 'move_forward', 'halt']
+
+### Sending commands to the robot
+The neural processing was done on a laptop since the RaspberryPi was already acting as a video streaming server and the
+main micro controller for our land robot. We used the MQTT protocol with Google's Google's cloud-based MQTT API in order
+to relay control messages back to our RaspberryPi.
+
+### Verification
+Upon arriving at each piece of garbage the robot takes a picture of it and relays that picture back to the main laptop.
+The picture is run through the trash identification neural network once more and if the system confirms that it is indeed
+garbage, the robot is sent a confirmation that it can pick it up.
+
+A demo is shown where the camera was pointed manually at a piece of litter in a manner similar to what the robot would see.
+Below is the result after running the captured image through the neural network.
+
+![Simulated testing](docs/IMG_5865.JPG)
 
 
+![Litter Verification](docs/Verified_mask.JPG)
 
+### Final Note
+This project was started in the Fall of 2019 and was scheduled to end in the Spring of 2020. Due to COVID-19, we no longer
+had access to the hardware that made up the land robot (servos + outer shell), as well as the aerial drone since, since both were property of the university.
+We therefore had to finish the project through mock experiments and with limited photos that included our robot. This meant
+we could not proceed with certain plans such as training a neural net to recognize the robot and instead we were forced
+to complete the project with some parts in a rudimentary state, and some features ditched completely.

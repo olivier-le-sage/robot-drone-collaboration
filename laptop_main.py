@@ -13,11 +13,6 @@
 # The outputs from these algorithms are then communicated to the robot via MQTT.
 
 
-'''
-To call verification method use this command
-'''
-# verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=False)
-
 import sys
 import bluetooth as bt # pybluez
 import datetime as dt
@@ -44,6 +39,7 @@ import proto.bin.message_defs_pb2 as message_defs_pb2
 import pathlib
 import time
 
+
 ########## Constants ##########
 
 BLUETOOTH_SVR_NAME = "" # own name
@@ -67,32 +63,32 @@ QUIET_MODE = True
 # Code run in video
 ############################################################################################
 
-# piPhysicalAddr = 'dc-a6-32-2e-b9-a8'
-#
-# command1 = 'netsh interface ip show addresses "Local Area Connection* 12"'
-# process1 = subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=None, shell=True)
-# output1 = process1.communicate()
-# netsh = output1[0].decode("utf-8")
-# netstring = netsh.split()
-# ipaddr = netstring[12]
 
-# Takes the retrieved IP address and adds it to the "arp" command which
-# retrieves all IP addresses connected to ipaddr
-# maincom = 'arp -a -N ' + ipaddr
+def setup_pi():
+    piPhysicalAddr = 'dc-a6-32-2e-b9-a8'
+    command1 = 'netsh interface ip show addresses "Local Area Connection* 12"'
+    process1 = subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=None, shell=True)
+    output1 = process1.communicate()
+    netsh = output1[0].decode("utf-8")
+    netstring = netsh.split()
+    ipaddr = netstring[12]
 
-# Inputs the arp command into the terminal to get the list of connected
-# devices and IP addresses and then searches through them to find the
-# one associated with piPhysicalAddr (MAC address of pi)
+    # Takes the retrieved IP address and adds it to the "arp" command which
+    # retrieves all IP addresses connected to ipaddr
+    maincom = 'arp -a -N ' + ipaddr
 
-# command2 = 'arp -a -N ' + ipaddr
-# command2 = 'arp -a -N ' + ipaddr
-# process2 = subprocess.Popen(command2, stdout=subprocess.PIPE, stderr=None, shell=True)
-# output2 = process2.communicate()
-# arpdecoded = output2[0].decode("utf-8")
-# arpstring = arpdecoded.split()
-# for i in range(len(arpstring)):
-#     if arpstring[i] == piPhysicalAddr:
-#         rtmpip = arpstring[i - 1]
+    # Inputs the arp command into the terminal to get the list of connected
+    # devices and IP addresses and then searches through them to find the
+    # one associated with piPhysicalAddr (MAC address of pi)
+
+    command2 = 'arp -a -N ' + ipaddr
+    process2 = subprocess.Popen(command2, stdout=subprocess.PIPE, stderr=None, shell=True)
+    output2 = process2.communicate()
+    arpdecoded = output2[0].decode("utf-8")
+    arpstring = arpdecoded.split()
+    for i in range(len(arpstring)):
+        if arpstring[i] == piPhysicalAddr:
+            rtmpip = arpstring[i - 1]
 
 ###########################################################################################
 
@@ -121,7 +117,8 @@ def bluetooth_server():
 def on_message(client, userdata, msg):
     print("[STATUS] %s | %s" % (msg.topic, msg.payload))
 
-def perform_verification():
+
+def perform_verification(rtmpip):
     images = "src/Trash_Detection/images2"  # relative to this file
     ROOT_DIR = str(pathlib.Path(__file__).parent.absolute())
     print(ROOT_DIR)
@@ -137,60 +134,71 @@ def perform_verification():
 
 ############ Main #############
 
-# Start the bluetooth server
-bt_t = Thread(target=bluetooth_server)
-# bt_t.start()
-# print("Bluetooth started.")
 
-# initialize trash detection (and load images)
-images = "src/Trash_Detection/images2" # relative to this file
-td = trash_detect.TrashDetector(images_dir=images)
+def run_main(rtmpip):
+    # Setup the automatic connection to the Pi
+    #setup_pi()
 
-# perform_verification()
-# time.sleep(5)
-# verification_test = td.verify_trash(images+"/verification001.jpg",quiet_mode=QUIET_MODE)
-# print(verification_test)
+    # Start the bluetooth server
+    bt_t = Thread(target=bluetooth_server)
+    # bt_t.start()
+    # print("Bluetooth started.")
 
-# initialize MQTT Client
-mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,
-                                sub_topics=SUB_TOPICS, QoS_level=2)
-# mqtt_interface.subscribe("olivier-le-sage/land-robot/move")
-# mqtt_interface.start() # run mqtt_interface as a thread
+    # initialize trash detection (and load images)
+    images = "src/Trash_Detection/images2"  # relative to this file
+    td = trash_detect.TrashDetector(images_dir=images)
 
-# 1. Receive images from the drone
-# Nothing to do here as we will be loading sample images for the demo
-print("[STATUS] Receiving images from drone.")
+    # initialize MQTT Client
+    mqtt_interface = MQTTSender(MQTT_CLIENT_ID, MQTT_BROKER, MQTT_HOSTNAME,
+                                    sub_topics=SUB_TOPICS, QoS_level=2)
+    # mqtt_interface.subscribe("olivier-le-sage/land-robot/move")
+    # mqtt_interface.start() # run mqtt_interface as a thread
 
-# 2. Process images and generate path + initial location/pose of the robot
-print("[STATUS] Processing images... please wait.")
-point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=QUIET_MODE)
-print("[STATUS] Trash detection complete.")
+    # 1. Receive images from the drone
+    # Nothing to do here as we will be loading sample images for the demo
+    print("[STATUS] Receiving images from drone.")
 
-# 3. Convert path to instructions
-commands = gen_commands_from_path(point_list, pose, size)
+    # 2. Process images and generate path + initial location/pose of the robot
+    print("[STATUS] Processing images... please wait.")
+    point_list, pose, size = td.run_single(r"C:\Users\spenc\Uni Fourth Year\Capstone\Code\robot-drone-collaboration\src\Trash_Detection\images2\demo_pic.jpg",quiet_mode=QUIET_MODE)
+    print("[STATUS] Trash detection complete.")
 
-# 4. Send instructions to robot via MQTT payloads
-print("[DEBUG] Commands generated from path: \n", commands)
-to_publish = []
-for cmd in commands:
-    robot_cmd = message_defs_pb2.MoveCommand()
-    robot_cmd.name = cmd
-    if (cmd == 'move_forward') or (cmd == 'move_backward'):
-        robot_cmd.arg1 = 1 # let's say 1 sec = 10 cm
-    if (cmd == 'pivot_turn_left') or (cmd == 'pivot_turn_right'):
-        robot_cmd.arg1 = 1 # let's say 1 sec = 10 degrees
+    # 3. Convert path to instructions
+    commands = gen_commands_from_path(point_list, pose, size)
 
-    #mqtt_interface.publish('olivier-le-sage/land-robot/move',
-    #                        robot_cmd.SerializeToString())
+    # 4. Send instructions to robot via MQTT payloads
+    print("[DEBUG] Commands generated from path: \n", commands)
+    to_publish = []
+    for cmd in commands:
+        robot_cmd = message_defs_pb2.MoveCommand()
+        robot_cmd.name = cmd
+        if (cmd == 'move_forward') or (cmd == 'move_backward'):
+            robot_cmd.arg1 = 1 # let's say 1 sec = 10 cm
+        if (cmd == 'pivot_turn_left') or (cmd == 'pivot_turn_right'):
+            robot_cmd.arg1 = 1 # let's say 1 sec = 10 degrees
 
-    to_publish.append( ('olivier-le-sage/land-robot/move',
-                        robot_cmd.SerializeToString(), 2, False) )
+        #mqtt_interface.publish('olivier-le-sage/land-robot/move',
+        #                        robot_cmd.SerializeToString())
 
-# for the demo we'll just publish the whole list
-publish.multiple(to_publish, hostname=MQTT_BROKER, client_id=MQTT_CLIENT_ID)
+        to_publish.append( ('olivier-le-sage/land-robot/move',
+                            robot_cmd.SerializeToString(), 2, False) )
 
-# Then very simple subscribe to any topics we want to (blocking call)
-subscribe.callback(on_message, SUB_TOPICS, hostname=MQTT_BROKER)
+    # for the demo we'll just publish the whole list
+    publish.multiple(to_publish, hostname=MQTT_BROKER, client_id=MQTT_CLIENT_ID)
+
+    # Then very simple subscribe to any topics we want to (blocking call)
+    #subscribe.callback(on_message, SUB_TOPICS, hostname=MQTT_BROKER)
+
+    # TODO: This should run after the robot has sent a signal acknowledging that it has reached a 'Halt' command. For now
+    #  it just runs automatically for demo purposes
+    perform_verification(rtmpip)
+    print("[DEBUG] Entering sleep")
+    time.sleep(5)
+    verification_test = td.verify_trash(r"C:\Users\spenc\Uni Fourth Year\Capstone\Code\robot-drone-collaboration\src\Trash_Detection\images2\verification001.jpg")
+    if verification_test:
+        print("[STATUS] Litter detected.")
+    else:
+        print("[STATUS] NO litter detected.")
 
 ##### Interactive demo given in February 2020 #####
 def run_interactive_demo():

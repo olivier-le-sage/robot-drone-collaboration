@@ -1,3 +1,7 @@
+# TODO: The current paths are hardcoded because the previous path implementation was sloppy and would duplicate folder
+#   names. Need to find a better implementation.
+
+
 #-------------------
 # Imports
 #-------------------
@@ -9,7 +13,7 @@ from src.Trash_Detection import TrashDetector as Trash
 from PIL import Image
 from PIL import ImageTk
 import pathlib
-import os
+import laptop_main
 
 
 
@@ -50,7 +54,7 @@ for i in range(len(arpstring)):
         rtmpip = arpstring[i-1]
 
 
-images = "src/Trash_Detection/images2" # relative to this file
+images = "src/Trash_Detection/images2"  # relative to this file
 td = Trash.TrashDetector(images_dir=images)
 
 
@@ -118,9 +122,12 @@ def onClick1(label):
 # Function that is run when the "Run" button is clicked. This starts the 
 # trash detection on the picture stored in the directory after the "Capture"
 # button was clicked.
+
+
 def onClick2():
-	point_list, pose, size = td.run_single(images+"/demo_pic.jpg",quiet_mode=False)
-    
+    laptop_main.run_main(rtmpip)
+    #point_list, pose, size = td.run_single(r"C:\Users\spenc\Uni Fourth Year\Capstone\Code\robot-drone-collaboration\src\Trash_Detection\images2\demo_pic.jpg")
+
 
 # The following code initializes the GUI window
 
