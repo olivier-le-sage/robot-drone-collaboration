@@ -1,6 +1,8 @@
 # robot-drone-collaboration
 An inter-machine cooperation project using Python and C.
 
+![it lives!](docs/movement.GIF?raw=true "")
+
 ## Objective
 The goal of this project was to have two autonomous vehicles - a land
 based robot and an air based drone - cooperate together autonomously
